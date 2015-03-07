@@ -17,11 +17,12 @@
 				<BScanLen>1</BScanLen>
 				<BScanVal>0</BScanVal>
 			</Bypass>
-			<File>C:/Users/seb/trng/breakout/trng/trng/trng_Implmnt/sbt/outputs/bitmap/breakout_trng_top_bitmap.hex</File>
-			<FileTime>11/05/14 01:20:15</FileTime>
+			<File>W:/trng/projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/outputs/bitmap/breakout_trng_top_bitmap.hex</File>
+			<FileTime>03/07/15 12:12:56</FileTime>
 			<Operation>SPI Flash Erase,Program,Verify</Operation>
 			<Option>
 				<SVFVendor>JTAG STANDARD</SVFVendor>
+				<SVFProcessor>SVF Processor</SVFProcessor>
 				<AccessMode>SPI Flash Programming</AccessMode>
 			</Option>
 			<FPGALoader>
@@ -44,6 +45,7 @@
 					<Option>
 						<SVFVendor>JTAG STANDARD</SVFVendor>
 						<IOState>HighZ</IOState>
+						<SVFProcessor>SVF Processor</SVFProcessor>
 						<AccessMode>JTAG</AccessMode>
 					</Option>
 				</Device>
@@ -57,9 +59,9 @@
 					<IDCode>0x16</IDCode>
 					<Package>8-pin VDFPN8</Package>
 					<Operation>SPI Flash Erase,Program,Verify</Operation>
-					<File>C:/Users/seb/trng/breakout/trng/trng/trng_Implmnt/sbt/outputs/bitmap/breakout_trng_top_bitmap.hex</File>
+					<File>W:/trng/projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/outputs/bitmap/breakout_trng_top_bitmap.hex</File>
 					<AddressBase>0x00000000</AddressBase>
-					<EndAddress>0x003F0000</EndAddress>
+					<EndAddress>0x00020000</EndAddress>
 					<DeviceSize>32</DeviceSize>
 					<DataSize>135178</DataSize>
 					<NumberOfDevices>1</NumberOfDevices>
@@ -78,6 +80,7 @@
 					</LocalChainList>
 					<Option>
 						<SVFVendor>JTAG STANDARD</SVFVendor>
+						<SVFProcessor>SVF Processor</SVFProcessor>
 					</Option>
 				</Device>
 			</FPGADevice>
@@ -96,6 +99,6 @@
 	<CableOptions>
 		<CableName>USB2</CableName>
 		<PortAdd>FTUSB-0</PortAdd>
-		<USBID>Lattice FTUSB Interface Cable A Location 0000 Serial A</USBID>
+		<USBID>kidekin_trng A Location 0000 Serial A</USBID>
 	</CableOptions>
 </ispXCF>
