@@ -19,8 +19,8 @@
 				<BScanLen>1</BScanLen>
 				<BScanVal>0</BScanVal>
 			</Bypass>
-			<File>C:/Users/seb/trng/breakout/trng/trng/trng_Implmnt/sbt/outputs/bitmap/breakout_trng_top_bitmap.hex</File>
-			<FileTime>11/12/14 00:33:20</FileTime>
+			<File>W:/trng/projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/outputs/bitmap/breakout_trng_top_bitmap.hex</File>
+			<FileTime>03/07/15 12:12:56</FileTime>
 			<Operation>Program,Verify</Operation>
 			<Option>
 				<SVFVendor>JTAG STANDARD</SVFVendor>

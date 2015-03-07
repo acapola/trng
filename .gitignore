@@ -21,3 +21,17 @@ projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/trng.lsedata
 projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/trng.edf
 projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/trng.scf
 desktop.ini
+projects/ice40hx8k_breakout/async_rings/icecube2/breakout_trng_top.arearep
+projects/ice40hx8k_breakout/async_rings/icecube2/breakout_trng_top_drc.log
+projects/ice40hx8k_breakout/async_rings/icecube2/breakout_trng_top_lse.twr
+projects/ice40hx8k_breakout/async_rings/icecube2/breakout_trng_top_gatelevel.v.ve
+projects/ice40hx8k_breakout/async_rings/icecube2/breakout_trng_top_prim.v
+projects/ice40hx8k_breakout/async_rings/icecube2/breakout_trng_top_temp_lse.sdc
+projects/ice40hx8k_breakout/async_rings/icecube2/breakout_trng_top_prim.v.ve
+projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/netlist/oadb-breakout_trng_top/BFPGA_DESIGN_ep/breakout_trng_top/%I%N%T%E%R%F%A%C%E/master.tag
+projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/netlist/oadb-breakout_trng_top/BFPGA_DESIGN_rr/breakout_trng_top/%I%N%T%E%R%F%A%C%E/master.tag
+projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/netlist/oadb-breakout_trng_top/BFPGA_DESIGN_pk/breakout_trng_top/%I%N%T%E%R%F%A%C%E/master.tag
+projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/Temp/sbt_temp.sdc
+projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/Log/iceCube0.log
+projects/ice40hx8k_breakout/async_rings/icecube2/breakout_trng_top_for_lpf.sdc
+projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/netlist/oadb-breakout_trng_top/BFPGA_DESIGN_pl/breakout_trng_top/%I%N%T%E%R%F%A%C%E/master.tag
