@@ -1,0 +1,30 @@
+# ##############################################################################
+
+# iCEcube PCF
+
+# Version:            2014.04.26425
+
+# File Generated:     Nov 1 2014 15:43:49
+
+# Family & Device:    iCE40HX8K
+
+# Package:            CT256
+
+# ##############################################################################
+
+###MergeFF List 11
+set_io_ff o_led[2] -out ON
+set_io_ff o_led[3] -out ON
+set_io_ff o_led[0] -out ON
+set_io_ff o_led[1] -out ON
+
+###IOSet List 8
+set_io o_led[1] B4 -io_std SB_LVCMOS -pullup no
+set_io o_led[3] A1 -io_std SB_LVCMOS -pullup no
+set_io o_serial_data B12 -io_std SB_LVCMOS -pullup no
+set_io CLK J3 -io_std SB_LVCMOS -pullup no
+set_io i_serial_rts_n B13 -io_std SB_LVCMOS -pullup no
+set_io o_led[0] B5 -io_std SB_LVCMOS -pullup no
+set_io o_led[2] A2 -io_std SB_LVCMOS -pullup no
+set_io o_led[4] C5 -io_std SB_LVCMOS -pullup no
+

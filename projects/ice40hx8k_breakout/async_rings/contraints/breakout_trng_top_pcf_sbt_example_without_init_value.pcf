@@ -1,0 +1,112 @@
+# ##############################################################################
+
+# iCEcube PCF
+
+# Version:            2014.04.26425
+
+# File Generated:     Nov 15 2014 23:18:32
+
+# Family & Device:    iCE40HX8K
+
+# Package:            CT256
+
+# ##############################################################################
+
+###BLE List 56
+ble_pack T_12_20_logic_cluster_lc_1 {u_trng_top.trng.u3_rnd_src.stage0.u_0_u_trng_top.trng.extractor.o_sampled_i21_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i21}
+ble_pack T_14_19_logic_cluster_lc_5 {u_trng_top.trng.u2_rnd_src.stage6.LUT4_inst_u_trng_top.trng.extractor.o_sampled_i20_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i20}
+ble_pack T_14_20_logic_cluster_lc_2 {u_trng_top.trng.u0_rnd_src.stage3.LUT4_inst}
+ble_pack T_15_20_logic_cluster_lc_4 {u_trng_top.trng.u0_rnd_src.stage2.u_0_u_trng_top.trng.extractor.o_sampled_i2_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i2}
+ble_pack T_12_16_logic_cluster_lc_0 {u_trng_top.trng.u3_rnd_src.stage1.LUT4_inst_u_trng_top.trng.extractor.o_sampled_i22_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i22}
+ble_pack T_12_20_logic_cluster_lc_6 {u_trng_top.trng.u3_rnd_src.stage6.LUT4_inst}
+ble_pack T_13_20_logic_cluster_lc_2 {u_trng_top.trng.u2_rnd_src.stage2.u_0_u_trng_top.trng.extractor.o_sampled_i16_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i16}
+ble_pack T_15_19_logic_cluster_lc_2 {u_trng_top.trng.u0_rnd_src.stage6.LUT4_inst}
+ble_pack T_14_18_logic_cluster_lc_7 {u_trng_top.trng.u0_rnd_src.stage0.u_0_u_trng_top.trng.extractor.o_sampled_i0_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i0}
+ble_pack T_14_19_logic_cluster_lc_7 {u_trng_top.trng.u2_rnd_src.stage5.u_0}
+ble_pack T_14_20_logic_cluster_lc_4 {u_trng_top.trng.u2_rnd_src.stage3.LUT4_inst}
+ble_pack T_15_20_logic_cluster_lc_6 {u_trng_top.trng.u1_rnd_src.stage6.LUT4_inst_u_trng_top.trng.extractor.o_sampled_i13_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i13}
+ble_pack T_12_20_logic_cluster_lc_4 {u_trng_top.trng.u3_rnd_src.stage5.u_0_u_trng_top.trng.extractor.o_sampled_i26_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i26}
+ble_pack T_13_20_logic_cluster_lc_0 {u_trng_top.trng.u3_rnd_src.stage2.u_0}
+ble_pack T_15_19_logic_cluster_lc_4 {u_trng_top.trng.u0_rnd_src.stage1.LUT4_inst_u_trng_top.trng.extractor.o_sampled_i1_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i1}
+ble_pack T_15_20_logic_cluster_lc_1 {u_trng_top.trng.u0_rnd_src.stage2.u_0}
+ble_pack T_15_21_logic_cluster_lc_2 {u_trng_top.trng.u1_rnd_src.stage1.LUT4_inst}
+ble_pack T_13_20_logic_cluster_lc_7 {u_trng_top.trng.u3_rnd_src.stage3.LUT4_inst}
+ble_pack T_14_19_logic_cluster_lc_1 {u_trng_top.trng.u2_rnd_src.stage4.u_0}
+ble_pack T_14_20_logic_cluster_lc_6 {u_trng_top.trng.u2_rnd_src.stage0.u_0}
+ble_pack T_12_20_logic_cluster_lc_2 {u_trng_top.trng.u3_rnd_src.stage6.LUT4_inst_u_trng_top.trng.extractor.o_sampled_i27_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i27}
+ble_pack T_15_19_logic_cluster_lc_6 {u_trng_top.trng.u0_rnd_src.stage3.LUT4_inst_u_trng_top.trng.extractor.o_sampled_i3_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i3}
+ble_pack T_15_20_logic_cluster_lc_3 {u_trng_top.trng.u1_rnd_src.stage2.u_0_u_trng_top.trng.extractor.o_sampled_i9_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i9}
+ble_pack T_15_21_logic_cluster_lc_0 {u_trng_top.trng.u1_rnd_src.stage2.u_0}
+ble_pack T_13_20_logic_cluster_lc_5 {u_trng_top.trng.u3_rnd_src.stage1.LUT4_inst}
+ble_pack T_14_19_logic_cluster_lc_3 {u_trng_top.trng.u2_rnd_src.stage6.LUT4_inst}
+ble_pack T_14_20_logic_cluster_lc_0 {u_trng_top.trng.u0_rnd_src.stage1.LUT4_inst}
+ble_pack T_14_21_logic_cluster_lc_1 {u_trng_top.trng.u1_rnd_src.stage0.u_0}
+ble_pack T_15_19_logic_cluster_lc_1 {u_trng_top.trng.u1_rnd_src.stage1.LUT4_inst_u_trng_top.trng.extractor.o_sampled_i8_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i8}
+ble_pack T_15_20_logic_cluster_lc_2 {u_trng_top.trng.u1_rnd_src.stage5.u_0_u_trng_top.trng.extractor.o_sampled_i12_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i12}
+ble_pack T_15_21_logic_cluster_lc_1 {u_trng_top.trng.u1_rnd_src.stage4.u_0}
+ble_pack T_12_20_logic_cluster_lc_0 {u_trng_top.trng.u3_rnd_src.stage4.u_0_u_trng_top.trng.extractor.o_sampled_i25_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i25}
+ble_pack T_13_20_logic_cluster_lc_4 {u_trng_top.trng.u3_rnd_src.stage0.u_0}
+ble_pack T_14_19_logic_cluster_lc_4 {u_trng_top.trng.u2_rnd_src.stage5.u_0_u_trng_top.trng.extractor.o_sampled_i19_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i19}
+ble_pack T_14_20_logic_cluster_lc_1 {u_trng_top.trng.u2_rnd_src.stage3.LUT4_inst_u_trng_top.trng.extractor.o_sampled_i17_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i17}
+ble_pack T_14_21_logic_cluster_lc_0 {u_trng_top.trng.u1_rnd_src.stage0.u_0_u_trng_top.trng.extractor.o_sampled_i7_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i7}
+ble_pack T_15_20_logic_cluster_lc_5 {u_trng_top.trng.u0_rnd_src.stage0.u_0}
+ble_pack T_15_21_logic_cluster_lc_6 {u_trng_top.trng.u1_rnd_src.stage5.u_0}
+ble_pack T_12_16_logic_cluster_lc_1 {u_trng_top.trng.u3_rnd_src.stage2.u_0_u_trng_top.trng.extractor.o_sampled_i23_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i23}
+ble_pack T_13_20_logic_cluster_lc_3 {u_trng_top.trng.u2_rnd_src.stage2.u_0}
+ble_pack T_15_21_logic_cluster_lc_7 {u_trng_top.trng.u1_rnd_src.stage6.LUT4_inst}
+ble_pack T_15_22_logic_cluster_lc_2 {u_trng_top.trng.u1_rnd_src.stage3.LUT4_inst_u_trng_top.trng.extractor.o_sampled_i10_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i10}
+ble_pack T_14_19_logic_cluster_lc_6 {u_trng_top.trng.u2_rnd_src.stage4.u_0_u_trng_top.trng.extractor.o_sampled_i18_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i18}
+ble_pack T_14_20_logic_cluster_lc_3 {u_trng_top.trng.u0_rnd_src.stage4.u_0}
+ble_pack T_15_20_logic_cluster_lc_7 {u_trng_top.trng.u0_rnd_src.stage6.LUT4_inst_u_trng_top.trng.extractor.o_sampled_i6_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i6}
+ble_pack T_12_20_logic_cluster_lc_7 {u_trng_top.trng.u3_rnd_src.stage3.LUT4_inst_u_trng_top.trng.extractor.o_sampled_i24_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i24}
+ble_pack T_13_20_logic_cluster_lc_1 {u_trng_top.trng.u3_rnd_src.stage5.u_0}
+ble_pack T_15_19_logic_cluster_lc_5 {u_trng_top.trng.u0_rnd_src.stage5.u_0}
+ble_pack T_15_21_logic_cluster_lc_5 {u_trng_top.trng.u1_rnd_src.stage3.LUT4_inst}
+ble_pack T_14_19_logic_cluster_lc_0 {u_trng_top.trng.u2_rnd_src.stage0.u_0_u_trng_top.trng.extractor.o_sampled_i14_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i14}
+ble_pack T_12_20_logic_cluster_lc_5 {u_trng_top.trng.u2_rnd_src.stage1.LUT4_inst_u_trng_top.trng.extractor.o_sampled_i15_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i15}
+ble_pack T_15_19_logic_cluster_lc_7 {u_trng_top.trng.u0_rnd_src.stage4.u_0_u_trng_top.trng.extractor.o_sampled_i4_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i4}
+ble_pack T_15_20_logic_cluster_lc_0 {u_trng_top.trng.u1_rnd_src.stage4.u_0_u_trng_top.trng.extractor.o_sampled_i11_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i11}
+ble_pack T_13_20_logic_cluster_lc_6 {u_trng_top.trng.u3_rnd_src.stage4.u_0}
+ble_pack T_14_19_logic_cluster_lc_2 {u_trng_top.trng.u0_rnd_src.stage5.u_0_u_trng_top.trng.extractor.o_sampled_i5_REP_LUT4_0,u_trng_top.trng.extractor.o_sampled_i5}
+ble_pack T_14_20_logic_cluster_lc_7 {u_trng_top.trng.u2_rnd_src.stage1.LUT4_inst}
+
+###CLB List 11
+clb_pack T_15_21 {T_15_21_logic_cluster_lc_0,T_15_21_logic_cluster_lc_1,T_15_21_logic_cluster_lc_2,,,T_15_21_logic_cluster_lc_5,T_15_21_logic_cluster_lc_6,T_15_21_logic_cluster_lc_7}
+set_location T_15_21 15 21
+clb_pack T_12_16 {T_12_16_logic_cluster_lc_0,T_12_16_logic_cluster_lc_1,,,,,,}
+set_location T_12_16 12 16
+clb_pack T_14_19 {T_14_19_logic_cluster_lc_0,T_14_19_logic_cluster_lc_1,T_14_19_logic_cluster_lc_2,T_14_19_logic_cluster_lc_3,T_14_19_logic_cluster_lc_4,T_14_19_logic_cluster_lc_5,T_14_19_logic_cluster_lc_6,T_14_19_logic_cluster_lc_7}
+set_location T_14_19 14 19
+clb_pack T_14_20 {T_14_20_logic_cluster_lc_0,T_14_20_logic_cluster_lc_1,T_14_20_logic_cluster_lc_2,T_14_20_logic_cluster_lc_3,T_14_20_logic_cluster_lc_4,,T_14_20_logic_cluster_lc_6,T_14_20_logic_cluster_lc_7}
+set_location T_14_20 14 20
+clb_pack T_15_20 {T_15_20_logic_cluster_lc_0,T_15_20_logic_cluster_lc_1,T_15_20_logic_cluster_lc_2,T_15_20_logic_cluster_lc_3,T_15_20_logic_cluster_lc_4,T_15_20_logic_cluster_lc_5,T_15_20_logic_cluster_lc_6,T_15_20_logic_cluster_lc_7}
+set_location T_15_20 15 20
+clb_pack T_15_22 {,,T_15_22_logic_cluster_lc_2,,,,,}
+set_location T_15_22 15 22
+clb_pack T_12_20 {T_12_20_logic_cluster_lc_0,T_12_20_logic_cluster_lc_1,T_12_20_logic_cluster_lc_2,,T_12_20_logic_cluster_lc_4,T_12_20_logic_cluster_lc_5,T_12_20_logic_cluster_lc_6,T_12_20_logic_cluster_lc_7}
+set_location T_12_20 12 20
+clb_pack T_13_20 {T_13_20_logic_cluster_lc_0,T_13_20_logic_cluster_lc_1,T_13_20_logic_cluster_lc_2,T_13_20_logic_cluster_lc_3,T_13_20_logic_cluster_lc_4,T_13_20_logic_cluster_lc_5,T_13_20_logic_cluster_lc_6,T_13_20_logic_cluster_lc_7}
+set_location T_13_20 13 20
+clb_pack T_14_18 {,,,,,,,T_14_18_logic_cluster_lc_7}
+set_location T_14_18 14 18
+clb_pack T_14_21 {T_14_21_logic_cluster_lc_0,T_14_21_logic_cluster_lc_1,,,,,,}
+set_location T_14_21 14 21
+clb_pack T_15_19 {,T_15_19_logic_cluster_lc_1,T_15_19_logic_cluster_lc_2,,T_15_19_logic_cluster_lc_4,T_15_19_logic_cluster_lc_5,T_15_19_logic_cluster_lc_6,T_15_19_logic_cluster_lc_7}
+set_location T_15_19 15 19
+
+###MergeFF List 4
+set_io_ff o_led[0] -out ON
+set_io_ff o_led[1] -out ON
+set_io_ff o_led[2] -out ON
+set_io_ff o_led[3] -out ON
+
+###IOSet List 8
+set_io o_led[1] B4 -io_std SB_LVCMOS -pullup no
+set_io o_led[3] A1 -io_std SB_LVCMOS -pullup no
+set_io o_serial_data B12 -io_std SB_LVCMOS -pullup no
+set_io CLK J3 -io_std SB_LVCMOS -pullup no
+set_io i_serial_rts_n B13 -io_std SB_LVCMOS -pullup no
+set_io o_led[0] B5 -io_std SB_LVCMOS -pullup no
+set_io o_led[2] A2 -io_std SB_LVCMOS -pullup no
+set_io o_led[4] C5 -io_std SB_LVCMOS -pullup no
+

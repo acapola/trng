@@ -1,0 +1,45 @@
+#-- Lattice, Inc.
+#-- Project file W:\trng\projects\ice40hx8k_breakout\async_rings\icecube2\trng_lse.prj
+
+#device
+-a SBTiCE40
+-d iCE40HX8K
+-t CT256
+#constraint file
+-sdc "../contraints/timing100MHz_syn.sdc"
+
+#options
+-frequency 200
+-optimization_goal Area
+-twr_paths 3
+-bram_utilization 100.00
+-ramstyle Auto
+-romstyle Auto
+-use_carry_chain 1
+-carry_chain_length 0
+-resource_sharing 0
+-propagate_constants 1
+-remove_duplicate_regs 1
+-max_fanout 10000
+-fsm_encoding_style Auto
+-use_io_insertion 1
+-use_io_reg auto
+-ifd 
+-resolve_mixed_drivers 0
+-RWCheckOnRam 0
+-fix_gated_clocks 1
+-top breakout_trng_top
+
+-ver "../../../../src/trng_top.v"
+-ver "../../../../src/trng_com.v"
+-ver "../../../../src/auto_correlation.v"
+-ver "../../../../src/breakout/breakout_trng_top.v"
+-ver "../../../../src/ice40/ring_stage_ice40.v"
+-ver "../../../../src/ice40/trng_pll_96MHz.v"
+-p "W:/trng/projects/ice40hx8k_breakout/async_rings/icecube2"
+
+#set result format/file last
+-output_edif trng_Implmnt/trng.edf
+
+#set log file
+-logfile "trng_Implmnt/trng_lse.log"
