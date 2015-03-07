@@ -5,9 +5,14 @@ set TRNG_IMPL async_trng
 #set TRNG_IMPL fake_trng
 
 set init_input 1
+#min is 1 (normal sampling)
+#max is 1K
+set TRNG_OVERSAMPLING 64
 
+#select one test at most
 set TRNG_AUTOCO 0
-set TRNG_RAW 1
+set TRNG_RAW 0
+set TRNG_RESET_TEST 1
 
 #AUTOCO parameters
 set AUTOCO_DELTA_WIDTH 6
@@ -16,9 +21,23 @@ set AUTOCO_WIDTH 7
 set AUTOCO_OFFSET 0
 set AUTOCO_MERGE 1
 
+#no periodic reset by default
+set PERIODIC_RESET 0
+#no fifo by default
+
 #RAW parameters
-set RAW_WIDTH_BYTES 4
-set PERIODIC_RESET 64
+if {$TRNG_RAW} {
+	set RAW_WIDTH_BYTES 4
+	set PERIODIC_RESET 64
+	set HAS_FIFO 1
+}
+
+#RESET_TEST parameters
+if {$TRNG_RESET_TEST} {
+	#reset after each FIFO fill up (16K on hx8k)
+	set PERIODIC_RESET 1
+	set HAS_FIFO 1
+}
 
 #fixed/computed parameters
 
@@ -26,7 +45,7 @@ set PERIODIC_RESET 64
 #This is set to 1 later on if no test config active.
 set TRNG_APP 0
 #TRNG_TEST: 1 if we build a test
-set TRNG_TEST [expr $TRNG_AUTOCO | $TRNG_RAW]
+set TRNG_TEST [expr $TRNG_AUTOCO | $TRNG_RAW | $TRNG_RESET_TEST]
 
 
 if {$TRNG_TEST} {
@@ -37,9 +56,9 @@ if {$TRNG_TEST} {
 		set TRNG_SRC_WIDTH 7
 		#set TRNG_SRC_INIT 7'b1001010
 		#set TRNG_SRC_INIT 7'b1001000
-		#set init_value [list 0 1 0 1 0 0 1]
+		set init_value [list 0 1 0 1 0 0 1]
 		#set init_value [list 0 0 0 1 0 0 1]
-		set init_value  [list 0 1 0 1 0 0 0]
+		#set init_value  [list 0 1 0 1 0 0 0]
 	}
 	set config32s {
 		set BYTE_ALIGNED_SAMPLED_DATA {wire [31:0] byteAlignedSampledData = trng_sampled;}
@@ -106,8 +125,12 @@ localparam TRNG_OUT_WIDTH = `$TRNG_OUT_WIDTH`;
 
 reg trng_reset;
 wire com_ready;	
-wire trng_read = com_ready;
 wire trng_valid;
+``if {$HAS_FIFO} {``
+wire trng_read = trng_valid;
+``} else {``
+wire trng_read = com_ready;
+``}``
 wire [7:0] trng_dat;
 wire com_new_frame;
 reg send;
@@ -203,7 +226,7 @@ packet_com u_packet_com(
 	.i_start_packet(com_start_packet),
 	.i_packet_size(PACKET_SIZE_BYTES),
 	.o_packet_ongoing(com_packet_ongoing),
-``} elseif $TRNG_RAW {``
+``} elseif {$HAS_FIFO} {``
 wire [7:0] fifo_out;
 reg ram_valid;
 reg fifo_read_l1;
@@ -253,18 +276,18 @@ always @(posedge i_clk) begin
 	else if(com_new_frame) o_dat_cnt <= o_dat_cnt + 1'b1;	
 end
 
-``if {$TRNG_RAW && $PERIODIC_RESET} {``
+``if {$PERIODIC_RESET} {``
 reg [15:0] periodic_reset_cnt;
 wire fifo_emptied = (~ram_valid) & fifo_read_l1;//single cycle pulse
 wire periodic_reset = fifo_emptied & (periodic_reset_cnt==`$PERIODIC_RESET`);
 reg periodic_reset_l1;
 always @(posedge i_clk) periodic_reset_l1 <= periodic_reset;//register to have at least one full clock cycle to reset the trng
 always @(posedge i_clk) begin
-	if(i_reset | periodic_reset) periodic_reset_cnt <= {{15{1'b0}},1};
+	if(i_reset | periodic_reset) periodic_reset_cnt <= {{15{1'b0}},1'b1};
 	else if(fifo_emptied) periodic_reset_cnt <= periodic_reset_cnt + 1'b1;	
 end
 reg fifo_write;
-always @(posedge i_clk) fifo_write <= ~ram_valid & ~periodic_reset;//fifo_write remains high for 1 cycle more than needed but fifo ignore it so no data is overwritten
+always @(posedge i_clk) fifo_write <= ~ram_valid & ~periodic_reset``if {$TRNG_RESET_TEST} {`` & trng_valid``}``;//fifo_write remains high for 1 cycle more than needed but fifo ignore it so no data is overwritten
 always @* trng_reset = i_reset | periodic_reset_l1;
 ``} else {``
 wire fifo_write = ~ram_valid;
@@ -283,7 +306,11 @@ always @(posedge i_clk) ext_clk1 <= ext_clk0;
 always @* o_spy_a = {ext_clk0,spy_a};
 always @* o_spy_b = {i_reset,spy_b};
 always @* o_spy_c = {ext_clk1,spy_c};*/
-`$TRNG_IMPL` trng (
+``if {$TRNG_IMPL=="fake_trng"} {``
+fake_trng #(.WIDTH(TRNG_OUT_WIDTH),.NSRC(TRNG_NSRC), .SRC_WIDTH(TRNG_SRC_WIDTH))``
+} else {``
+`$TRNG_IMPL```
+}`` trng (
 	.i_reset(trng_reset),
 ``if {$init_input} {``	
 	.i_src_init_val(TRNG_SRC_INIT),
@@ -306,20 +333,29 @@ fake_trng #(.WIDTH(TRNG_OUT_WIDTH),.NSRC(TRNG_NSRC), .SRC_WIDTH(TRNG_SRC_WIDTH))
 
 
 
-``if $TRNG_RAW {
+``if {$TRNG_RAW | $TRNG_RESET_TEST} {
+if {$TRNG_RAW} {
+	set FIFO_IN_WIDTH_BYTES $RAW_WIDTH_BYTES
+} else {
+	set FIFO_IN_WIDTH_BYTES [expr $TRNG_OUT_WIDTH/8]
+}
+
 #works up to RAW_WIDTH_BYTES=4
-set FIFO_DEPTH_WIDTH [expr (3+11)-($RAW_WIDTH_BYTES/2)]
+set FIFO_DEPTH_WIDTH [expr (3+11)-($FIFO_IN_WIDTH_BYTES/2)]
 ``
-localparam RAW_WIDTH_BYTES = `$RAW_WIDTH_BYTES`;
+localparam FIFO_IN_WIDTH_BYTES = `$FIFO_IN_WIDTH_BYTES`;
 localparam FIFO_DEPTH_WIDTH = `$FIFO_DEPTH_WIDTH`;
-`$BYTE_ALIGNED_SAMPLED_DATA`
 //we store sampled data in ram until its full and then dump the full memory
-wire [RAW_WIDTH_BYTES*8-1:0] fifo_in = byteAlignedSampledData[RAW_WIDTH_BYTES*8-1:0];
+``if {$TRNG_RAW} {``
+`$BYTE_ALIGNED_SAMPLED_DATA`
+wire [FIFO_IN_WIDTH_BYTES*8-1:0] fifo_in = byteAlignedSampledData[FIFO_IN_WIDTH_BYTES*8-1:0];
+``} else {``
+reg [FIFO_IN_WIDTH_BYTES*8-1:0] fifo_in;
+always @(posedge i_clk) fifo_in <= trng_dat[FIFO_IN_WIDTH_BYTES*8-1:0];//pipeline reg because fifo_write is delayed as well
+``}``
 wire fifo_empty,fifo_full;
 fifo #(
-	//.IN_WIDTH(RAW_WIDTH_BYTES*8),
-	//.OUT_WIDTH(8),
-	.DEPTH_WIDTH(FIFO_DEPTH_WIDTH)//`expr (1<<$FIFO_DEPTH_WIDTH)*$RAW_WIDTH_BYTES` bytes FIFO
+	.DEPTH_WIDTH(FIFO_DEPTH_WIDTH)//`expr (1<<$FIFO_DEPTH_WIDTH)*$FIFO_IN_WIDTH_BYTES` bytes FIFO
 	) u_fifo (
 	.i_reset(i_reset),
 	.i_clk(i_clk),
@@ -328,7 +364,11 @@ fifo #(
 	.i_dat(fifo_in),
 	.o_dat(fifo_out),
 	.o_almost_empty(fifo_empty),
+``if {$TRNG_RAW} {``	
 	.o_almost_full(fifo_full)
+``} else {``
+	.o_full(fifo_full)
+``}``	
 	);
 always @(posedge i_clk) begin
 	if(i_reset) begin
@@ -346,10 +386,10 @@ end
 ``}``
 
 endmodule
-``if $TRNG_RAW {
+``if {$HAS_FIFO} {
 tgpp::source fifo_lib.tgpp.v
 ``
-`fifo_module fifo [expr 8*$RAW_WIDTH_BYTES] 8`
+`fifo_module fifo [expr 8*$FIFO_IN_WIDTH_BYTES] 8`
 ``}``
 
 ``if {$TRNG_IMPL=="fake_trng"} {``
@@ -383,13 +423,14 @@ always @(posedge i_clk) begin
 	end else begin
 		if(i_read & o_valid) begin
 			cnt <= {CNT_WIDTH{1'b0}};
-			o_dat <= o_sampled[7:0];
+			o_dat <= {WIDTH{1'b0}};
 		end else begin
+			o_dat <= o_dat+1'b1;//o_sampled[7:0];
 			if(~o_valid) cnt <= cnt + 1'b1;
 		end
 	end
 end
 always @* o_valid = cnt==WIDTH;
 endmodule
-`async_trng_module async_trng $TRNG_OUT_WIDTH $TRNG_NSRC $TRNG_SRC_WIDTH $init_value`
+`async_trng_module async_trng $TRNG_OUT_WIDTH $TRNG_NSRC $TRNG_SRC_WIDTH $TRNG_OVERSAMPLING $init_value`
 `backtick`default_nettype wire

@@ -61,7 +61,7 @@ module async_ring_ice40_loc #(
 	)/* synthesis syn_blackbox = 1 */ ;
 endmodule
 }
-proc async_trng_module { name WIDTH NSRC SRC_WIDTH {init_value [list]} } {
+proc async_trng_module { name WIDTH NSRC SRC_WIDTH OVERSAMPLING {init_value [list]} } {
 
 	set init_input [expr [llength $init_value]==0]
 	set SAMPLED_WIDTH [expr $NSRC*$SRC_WIDTH]
@@ -81,6 +81,7 @@ module `$name` (
 localparam WIDTH = `$WIDTH`;
 localparam SRC_WIDTH = `$SRC_WIDTH`;
 localparam SAMPLED_WIDTH = `$SAMPLED_WIDTH`;
+localparam TARGET_CNT = `$OVERSAMPLING` * WIDTH;
 wire raw_rnd;
 wire [SAMPLED_WIDTH-1:0] rnd_src_dat;
 ``for {set i 0} {$i<$NSRC} {incr i} {``
@@ -89,22 +90,28 @@ async_ring u`$i`_rnd_src (.i_reset(i_reset), ``if {$init_input} {``.i_init_val(i
 entropy_extractor #(.WIDTH(SAMPLED_WIDTH)) extractor (.i_clk(i_clk), .i_rnd_src(rnd_src_dat),
 	.o_sampled(o_sampled), .o_rnd(raw_rnd));
 localparam CNT_WIDTH = 8;
-reg [CNT_WIDTH-1:0] cnt;	
+reg [CNT_WIDTH-1:0] cnt;
+reg [CNT_WIDTH-1:0] cnt2;	
 always @(posedge i_clk) begin
 	if(i_reset) begin
 		cnt <= {CNT_WIDTH{1'b0}};
+		cnt2 <= {CNT_WIDTH{1'b0}};
 		o_dat <= {WIDTH{1'b0}};
 	end else begin
 		if(i_read & o_valid) begin
 			cnt <= {CNT_WIDTH{1'b0}};
+			cnt2 <= {CNT_WIDTH{1'b0}};
 			o_dat <= {{WIDTH-1{1'b0}},raw_rnd};//start a new output byte, keep them independent
 		end else begin
 			o_dat <= {o_dat[0+:WIDTH-1],o_dat[WIDTH-1]^raw_rnd};//the xor gather entropy in case the data is not consumed immediately
-			if(~o_valid) cnt <= cnt + 1'b1;
+			if(~o_valid) begin
+				cnt <= cnt + 1'b1;
+				if(cnt=={CNT_WIDTH{1'b1}}) cnt2 <= cnt2 + 1'b1;
+			end
 		end
 	end
 end
-always @* o_valid = cnt==WIDTH;
+always @* o_valid = {cnt2,cnt}==TARGET_CNT;
 endmodule
 `entropy_extractor_module`
 `async_ring_module async_ring $SRC_WIDTH $init_value`

@@ -22,39 +22,32 @@
 // 
 ////////////////////////////////////////////////////////////////////////////////
 
-module trng_tb;
+module top_tb;
 
 	// Inputs
 	reg i_reset;
-	reg [4:0] i_src_init_val;
+	reg [7:0] i_src_init_val;
 	reg i_clk;
 	reg i_read;
 
 	// Outputs
-	wire [7:0] o_dat;
-	wire o_valid;
-	wire [4:0] o_sampled;
+	wire o_dat;
+	wire [7:0] o_sampled;
 
 	// Instantiate the Unit Under Test (UUT)
-	async_trng uut (
-		.i_reset(i_reset), 
-		.i_src_init_val(i_src_init_val), 
-		.i_clk(i_clk), 
-		.i_read(i_read), 
-		.o_dat(o_dat), 
-		.o_valid(o_valid), 
-		.o_sampled(o_sampled)
+	lx150t_trng_top uut (
+		.RESET(i_reset), 
+		.DIP_Switches_8Bits_TRI_I(i_src_init_val), 
+		.CLK(i_clk), 
+		.RS232_USB_sin(1'b0), 
+		.RS232_USB_sout(o_dat), 
+		.LEDs_8Bits_TRI_O(o_sampled)
 	);
-	
-	always @(posedge i_clk) begin
-		if(o_valid) i_read <= 1'b1;
-		else i_read <= 1'b0;
-	end
 
 	initial begin
 		// Initialize Inputs
 		i_reset = 1;
-		i_src_init_val = 5'b01011;
+		i_src_init_val = 8'b10101010;
 		
 		// Wait 100 ns for global reset to finish
 		#300;

@@ -51,6 +51,19 @@ function [7:0] to_ascii_hex;
 	to_ascii_hex = in>9 ? (8'd65 - 8'd10) + in : 8'd48 + in;
 endfunction
 wire [7:0] to_send = DIP_Switches_8Bits_TRI_I[7] ? rnd : to_ascii_hex(data);
+wire i_serial_rts_n=1'b0;
+assign rnd[7:4] = 4'h0;
+trng_top u_trng_top(
+	.i_reset(RESET),
+	.i_clk(CLK),
+	.i_serial_rts_n(i_serial_rts_n),
+	.o_serial_data(RS232_USB_sout),
+	.o_dat_cnt(rnd[3:0])/*,
+	.o_spy_a(o_spy_a),
+	.o_spy_b(o_spy_b),
+	.o_spy_c(o_spy_c)*/
+    );
+/*
 tx u_tx(
 	.i_reset(RESET),
 	.i_clk(CLK),
@@ -61,11 +74,6 @@ tx u_tx(
 	.o_ready(read)
 	);
 
-/*always @(posedge CLK) begin
-	if(valid) read <= 1'b1;
-	else read <= 1'b0;
-end*/
-
 async_trng #(.WIDTH(8),.SRC_WIDTH(7)) trng (
 	.i_reset(RESET),
 	.i_src_init_val(DIP_Switches_8Bits_TRI_I[6:0]),
@@ -73,9 +81,11 @@ async_trng #(.WIDTH(8),.SRC_WIDTH(7)) trng (
 	.i_read(read),
 	.o_dat(rnd),
 	.o_valid(valid)
-);
+);*/
 
 endmodule
+
+/*
 module tx(
 	input wire i_reset,
 	input wire i_clk,
@@ -121,3 +131,4 @@ always @(posedge i_clk, posedge i_reset) begin
 	end
 end
 endmodule
+*/
