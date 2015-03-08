@@ -38,3 +38,6 @@ projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/netlist/oadb-b
 projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/Log/iceCube1.log
 projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/outputs/gui/trng_breakout_trng_top_timingviewer.cfg
 projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/outputs/gui/trng__timingviewer.cfg
+projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/trng_XXXXXOLD.edf
+projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/Log/iceCube2.log
+projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/trng_XXXXXOLD.scf

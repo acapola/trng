@@ -32,7 +32,7 @@ proc removeBits { inFileName filter {maxLength 0} } {
 	close $fout
 	close $fin
 }
-proc orthogonalStreams { inFileName blockLength } {
+proc orthogonalStreams_old { inFileName blockLength } {
 	set fin [open $inFileName]
 	fconfigure $fin -translation binary
 	set finLength [file size $inFileName]
@@ -44,14 +44,35 @@ proc orthogonalStreams { inFileName blockLength } {
 		fconfigure $fout -translation binary
 		lappend fouts $fout
 	}
-		rawToText $fin $fout $blockLength
-		close $fout
-		skipBlock $fin [expr (1024-16)*1024]
+	rawToText $fin $fout $blockLength
+	close $fout
+	skipBlock $fin [expr (1024-16)*1024]
 	
 	close $fin
 	foreach fout $fouts {
 		close $fout
 	}
+}
+proc orthogonalStreams { inFileName blockLength } {
+	set fin [open $inFileName]
+	fconfigure $fin -translation binary
+	set finLength [file size $inFileName]
+	set nBlocks [expr $finLength / $blockLength]
+	set outFileName "${inFileName}_ortho_${blockLength}.dat"
+	set fout [open $outFileName [list WRONLY CREAT TRUNC BINARY]]
+	fconfigure $fout -translation binary
+	for {set i 0} {$i<$blockLength} {incr i} {
+		seek $fin $i start
+		for {set block 0} {$block < $nBlocks} {incr block} {
+			set bBin [read $fin 1]
+			binary scan $bBin c b
+			#puts $b
+			puts -nonewline $fout [binary format c1 $b]
+			seek $fin [expr $blockLength-1] current
+		}
+	}
+	close $fin
+	close $fout
 }
 
 #94949494
@@ -65,9 +86,11 @@ proc filterByteLsb { bitIndex } {
 	return 1
 }
 
-set inFileName "20111112_4x7s96MHz_raw16k_periodic_reset64.dat"
-#set inFileName "test.dat"
-
-removeBits $inFileName filterByteLsb
-append inFileName _packed.dat
-#orthogonalStreams $inFileName 
+set inFileName "icestick.dat"
+if {0} {
+	#for raw stream analysis
+	set inFileName "20111112_4x7s96MHz_raw16k_periodic_reset64.dat"
+	removeBits $inFileName filterByteLsb
+	append inFileName _packed.dat
+}
+orthogonalStreams $inFileName [expr 16*1024]

@@ -12,9 +12,8 @@ module trng_top(
 //	output reg [7:0] o_spy_c*/
     );
 
-localparam TRNG_NSRC = 4;
-localparam TRNG_SRC_WIDTH = 7;
-localparam TRNG_SRC_INIT = 7'b1001010;
+localparam TRNG_NSRC = 1;
+localparam TRNG_SRC_WIDTH = 32;
 localparam TRNG_OUT_WIDTH = 8;
 
 reg trng_reset;
@@ -86,9 +85,8 @@ always @* o_spy_a = {ext_clk0,spy_a};
 always @* o_spy_b = {i_reset,spy_b};
 always @* o_spy_c = {ext_clk1,spy_c};*/
 
-async_trng trng (
+sb_trng trng (
 	.i_reset(trng_reset),
-	.i_src_init_val(TRNG_SRC_INIT),
 	.i_clk(i_clk),
 	.i_read(trng_read),
 	.o_dat(trng_dat),
@@ -97,7 +95,6 @@ async_trng trng (
 );
 fake_trng #(.WIDTH(TRNG_OUT_WIDTH),.NSRC(TRNG_NSRC), .SRC_WIDTH(TRNG_SRC_WIDTH)) u_fake_trng (
 	.i_reset(1'b0),//we output o_sampled only during reset time...
-	.i_src_init_val(TRNG_SRC_INIT),
 	.i_clk(i_clk),
 	.i_read(trng_read),
 	.o_dat(),
@@ -196,7 +193,6 @@ module fake_trng #(
 	parameter SRC_WIDTH = 5//size of each ring
 	)(
 	input wire i_reset,
-	input wire [SRC_WIDTH-1:0] i_src_init_val,
 	input wire i_clk,
 	input wire i_read,
 	output reg [WIDTH-1:0] o_dat,
@@ -228,27 +224,47 @@ always @(posedge i_clk) begin
 end
 always @* o_valid = cnt==WIDTH;
 endmodule
-module async_trng (
+module sb_trng (
 	input wire i_reset,
-	input wire [SRC_WIDTH-1:0] i_src_init_val,
 	input wire i_clk,
 	input wire i_read,
 	output reg [8-1:0] o_dat,
 	output reg o_valid,
-	output wire [28-1:0] o_sampled
+	output wire [32-1:0] o_sampled
 );
+
+// polynomial: (0 1 2 8)
+// data width: 32
+// convention: the first serial bit is D[31]
+function [7:0] nextCRC8_D32;
+	input [31:0] Data;
+	input [7:0] crc;
+	reg [31:0] d;
+	reg [7:0] c;
+	reg [7:0] newcrc;
+	begin
+		d = Data;
+		c = crc;
+
+		newcrc[0] = d[31] ^ d[30] ^ d[28] ^ d[23] ^ d[21] ^ d[19] ^ d[18] ^ d[16] ^ d[14] ^ d[12] ^ d[8] ^ d[7] ^ d[6] ^ d[0] ^ c[4] ^ c[6] ^ c[7];
+		newcrc[1] = d[30] ^ d[29] ^ d[28] ^ d[24] ^ d[23] ^ d[22] ^ d[21] ^ d[20] ^ d[18] ^ d[17] ^ d[16] ^ d[15] ^ d[14] ^ d[13] ^ d[12] ^ d[9] ^ d[6] ^ d[1] ^ d[0] ^ c[0] ^ c[4] ^ c[5] ^ c[6];
+		newcrc[2] = d[29] ^ d[28] ^ d[25] ^ d[24] ^ d[22] ^ d[17] ^ d[15] ^ d[13] ^ d[12] ^ d[10] ^ d[8] ^ d[6] ^ d[2] ^ d[1] ^ d[0] ^ c[0] ^ c[1] ^ c[4] ^ c[5];
+		newcrc[3] = d[30] ^ d[29] ^ d[26] ^ d[25] ^ d[23] ^ d[18] ^ d[16] ^ d[14] ^ d[13] ^ d[11] ^ d[9] ^ d[7] ^ d[3] ^ d[2] ^ d[1] ^ c[1] ^ c[2] ^ c[5] ^ c[6];
+		newcrc[4] = d[31] ^ d[30] ^ d[27] ^ d[26] ^ d[24] ^ d[19] ^ d[17] ^ d[15] ^ d[14] ^ d[12] ^ d[10] ^ d[8] ^ d[4] ^ d[3] ^ d[2] ^ c[0] ^ c[2] ^ c[3] ^ c[6] ^ c[7];
+		newcrc[5] = d[31] ^ d[28] ^ d[27] ^ d[25] ^ d[20] ^ d[18] ^ d[16] ^ d[15] ^ d[13] ^ d[11] ^ d[9] ^ d[5] ^ d[4] ^ d[3] ^ c[1] ^ c[3] ^ c[4] ^ c[7];
+		newcrc[6] = d[29] ^ d[28] ^ d[26] ^ d[21] ^ d[19] ^ d[17] ^ d[16] ^ d[14] ^ d[12] ^ d[10] ^ d[6] ^ d[5] ^ d[4] ^ c[2] ^ c[4] ^ c[5];
+		newcrc[7] = d[30] ^ d[29] ^ d[27] ^ d[22] ^ d[20] ^ d[18] ^ d[17] ^ d[15] ^ d[13] ^ d[11] ^ d[7] ^ d[6] ^ d[5] ^ c[3] ^ c[5] ^ c[6];
+		nextCRC8_D32 = newcrc;
+	end
+endfunction
+wire [7:0] crc_state = i_read & o_valid ? 8'h00 : o_dat;//start a new output byte, keep them independent
+wire [7:0] crc_sampled = nextCRC8_D32(o_sampled,crc_state);
+
 localparam WIDTH = 8;
-localparam SRC_WIDTH = 7;
-localparam SAMPLED_WIDTH = 28;
-localparam TARGET_CNT = 64 * WIDTH;
-wire raw_rnd;
-wire [SAMPLED_WIDTH-1:0] rnd_src_dat;
-async_ring u0_rnd_src (.i_reset(i_reset), .i_init_val(i_src_init_val), .o_dat(rnd_src_dat[0*SRC_WIDTH+:SRC_WIDTH]));
-async_ring u1_rnd_src (.i_reset(i_reset), .i_init_val(i_src_init_val), .o_dat(rnd_src_dat[1*SRC_WIDTH+:SRC_WIDTH]));
-async_ring u2_rnd_src (.i_reset(i_reset), .i_init_val(i_src_init_val), .o_dat(rnd_src_dat[2*SRC_WIDTH+:SRC_WIDTH]));
-async_ring u3_rnd_src (.i_reset(i_reset), .i_init_val(i_src_init_val), .o_dat(rnd_src_dat[3*SRC_WIDTH+:SRC_WIDTH]));
-entropy_extractor #(.WIDTH(SAMPLED_WIDTH)) extractor (.i_clk(i_clk), .i_rnd_src(rnd_src_dat),
-	.o_sampled(o_sampled), .o_rnd(raw_rnd));
+localparam SRC_WIDTH = 32;
+localparam SAMPLED_WIDTH = 32;
+localparam TARGET_CNT = 64 * WIDTH /8;
+sbentsrc #(.RNG_WIDTH(SRC_WIDTH)) u0_rnd_src (.i_reset(i_reset), .i_clk(i_clk), .i_en(1'b1), .o_rnd(o_sampled[0*SRC_WIDTH+:SRC_WIDTH]));
 localparam CNT_WIDTH = 8;
 reg [CNT_WIDTH-1:0] cnt;
 reg [CNT_WIDTH-1:0] cnt2;	
@@ -261,9 +277,9 @@ always @(posedge i_clk) begin
 		if(i_read & o_valid) begin
 			cnt <= {CNT_WIDTH{1'b0}};
 			cnt2 <= {CNT_WIDTH{1'b0}};
-			o_dat <= {{WIDTH-1{1'b0}},raw_rnd};//start a new output byte, keep them independent
+			o_dat <= crc_sampled;
 		end else begin
-			o_dat <= {o_dat[0+:WIDTH-1],o_dat[WIDTH-1]^raw_rnd};//the xor gather entropy in case the data is not consumed immediately
+			o_dat <= crc_sampled;
 			if(~o_valid) begin
 				cnt <= cnt + 1'b1;
 				if(cnt=={CNT_WIDTH{1'b1}}) cnt2 <= cnt2 + 1'b1;
@@ -273,90 +289,5 @@ always @(posedge i_clk) begin
 end
 always @* o_valid = {cnt2,cnt}==TARGET_CNT;
 endmodule
-module entropy_extractor #(
-	parameter WIDTH = 1
-	)(
-	input wire i_clk,
-	input wire [WIDTH-1:0] i_rnd_src,
-	output reg [WIDTH-1:0] o_sampled,
-	output reg o_rnd
-);
-always @(posedge i_clk) o_sampled <= i_rnd_src;
-always @(posedge i_clk) o_rnd <= ^o_sampled;
-endmodule
-
-module async_ring(
-	input wire i_reset,
-	input wire [7-1:0] i_init_val,
-	output wire [7-1:0] o_dat
-	);
 	
-reg [7-1:0] f_FP;
-reg [7-1:0] r_FP;	
-ring_stage_impl stage0(.i_reset(i_reset), 
-	.i_init_val(i_init_val[0]),
-	.i_f(f_FP[0]), .i_r(r_FP[0]), .o_c(o_dat[0]));
-always @* begin:F0
-	f_FP[0] = o_dat[6];
-end
-always @* begin:R0
-	r_FP[0] = o_dat[1];
-end
-ring_stage_impl stage1(.i_reset(i_reset), 
-	.i_init_val(i_init_val[1]),
-	.i_f(f_FP[1]), .i_r(r_FP[1]), .o_c(o_dat[1]));
-always @* begin:F1
-	f_FP[1] = o_dat[0];
-end
-always @* begin:R1
-	r_FP[1] = o_dat[2];
-end
-ring_stage_impl stage2(.i_reset(i_reset), 
-	.i_init_val(i_init_val[2]),
-	.i_f(f_FP[2]), .i_r(r_FP[2]), .o_c(o_dat[2]));
-always @* begin:F2
-	f_FP[2] = o_dat[1];
-end
-always @* begin:R2
-	r_FP[2] = o_dat[3];
-end
-ring_stage_impl stage3(.i_reset(i_reset), 
-	.i_init_val(i_init_val[3]),
-	.i_f(f_FP[3]), .i_r(r_FP[3]), .o_c(o_dat[3]));
-always @* begin:F3
-	f_FP[3] = o_dat[2];
-end
-always @* begin:R3
-	r_FP[3] = o_dat[4];
-end
-ring_stage_impl stage4(.i_reset(i_reset), 
-	.i_init_val(i_init_val[4]),
-	.i_f(f_FP[4]), .i_r(r_FP[4]), .o_c(o_dat[4]));
-always @* begin:F4
-	f_FP[4] = o_dat[3];
-end
-always @* begin:R4
-	r_FP[4] = o_dat[5];
-end
-ring_stage_impl stage5(.i_reset(i_reset), 
-	.i_init_val(i_init_val[5]),
-	.i_f(f_FP[5]), .i_r(r_FP[5]), .o_c(o_dat[5]));
-always @* begin:F5
-	f_FP[5] = o_dat[4];
-end
-always @* begin:R5
-	r_FP[5] = o_dat[6];
-end
-ring_stage_impl stage6(.i_reset(i_reset), 
-	.i_init_val(i_init_val[6]),
-	.i_f(f_FP[6]), .i_r(r_FP[6]), .o_c(o_dat[6]));
-always @* begin:F6
-	f_FP[6] = o_dat[5];
-end
-always @* begin:R6
-	r_FP[6] = o_dat[0];
-end
-endmodule
-
-
 `default_nettype wire

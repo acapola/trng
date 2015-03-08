@@ -1,13 +1,18 @@
 ``
 #config
 ::tgpp::source async_trng_lib.tgpp.v
-set TRNG_IMPL async_trng
+::tgpp::source sb_trng_lib.tgpp.v
+
+set TRNG_IMPL sb_trng
+#set TRNG_IMPL async_trng
 #set TRNG_IMPL fake_trng
 
 set init_input 1
 #min is 1 (normal sampling)
 #max is 1K
 set TRNG_OVERSAMPLING 64
+
+set TRNG_CRC_SAMPLING 1
 
 #select one test at most
 set TRNG_AUTOCO 0
@@ -50,36 +55,47 @@ set TRNG_TEST [expr $TRNG_AUTOCO | $TRNG_RAW | $TRNG_RESET_TEST]
 
 if {$TRNG_TEST} {
 #config to characterize the entropy source by recording the raw data in a FIFO
-	set config4x7s {
-		set BYTE_ALIGNED_SAMPLED_DATA {wire [31:0] byteAlignedSampledData = {trng_sampled[3*7+:7],1'b0,trng_sampled[2*7+:7],1'b0,trng_sampled[1*7+:7],1'b0,trng_sampled[0*7+:7],1'b0};}
-		set TRNG_NSRC 4
-		set TRNG_SRC_WIDTH 7
-		#set TRNG_SRC_INIT 7'b1001010
-		#set TRNG_SRC_INIT 7'b1001000
-		set init_value [list 0 1 0 1 0 0 1]
-		#set init_value [list 0 0 0 1 0 0 1]
-		#set init_value  [list 0 1 0 1 0 0 0]
+	switch $TRNG_IMPL {
+		sb_trng {
+			set init_input 0
+			set BYTE_ALIGNED_SAMPLED_DATA {wire [31:0] byteAlignedSampledData = trng_sampled;}
+			set TRNG_NSRC 1
+			set TRNG_SRC_WIDTH 32	
+		}
+		async_trng -
+		default {
+			set config4x7s {
+				set BYTE_ALIGNED_SAMPLED_DATA {wire [31:0] byteAlignedSampledData = {trng_sampled[3*7+:7],1'b0,trng_sampled[2*7+:7],1'b0,trng_sampled[1*7+:7],1'b0,trng_sampled[0*7+:7],1'b0};}
+				set TRNG_NSRC 4
+				set TRNG_SRC_WIDTH 7
+				#set TRNG_SRC_INIT 7'b1001010
+				#set TRNG_SRC_INIT 7'b1001000
+				set init_value [list 0 1 0 1 0 0 1]
+				#set init_value [list 0 0 0 1 0 0 1]
+				#set init_value  [list 0 1 0 1 0 0 0]
+			}
+			set config32s {
+				set BYTE_ALIGNED_SAMPLED_DATA {wire [31:0] byteAlignedSampledData = trng_sampled;}
+				set TRNG_NSRC 1
+				set TRNG_SRC_WIDTH 32
+				#set TRNG_SRC_INIT 32'h75_55_55_55
+				#set TRNG_SRC_INIT 32'h4C_70_F0_7C
+				#set TRNG_SRC_INIT 32'h4CC770F0
+				#set TRNG_SRC_INIT 32'h0000FFFF
+				#set TRNG_SRC_INIT 32'h0F0F0F0F
+				set init_value [list 0 1 0 0 1 1 0 0   0 1 1 1 0 0 0 0   1 1 1 1 0 0 0 0    0 1 1 1 1 1 0 0]
+			}
+			set config33s {
+				set BYTE_ALIGNED_SAMPLED_DATA {wire [31:0] byteAlignedSampledData = trng_sampled;}
+				set TRNG_NSRC 1
+				set TRNG_SRC_WIDTH 33
+				#set TRNG_SRC_INIT 33'h75_55_55_55
+				#set TRNG_SRC_INIT 33'h4C_70_F0_7C
+				set init_value [list 0    0 1 0 0 1 1 0 0   0 1 1 1 0 0 0 0   1 1 1 1 0 0 0 0    0 1 1 1 1 1 0 0]
+			}
+			eval $config4x7s
+		}
 	}
-	set config32s {
-		set BYTE_ALIGNED_SAMPLED_DATA {wire [31:0] byteAlignedSampledData = trng_sampled;}
-		set TRNG_NSRC 1
-		set TRNG_SRC_WIDTH 32
-		#set TRNG_SRC_INIT 32'h75_55_55_55
-		#set TRNG_SRC_INIT 32'h4C_70_F0_7C
-		#set TRNG_SRC_INIT 32'h4CC770F0
-		#set TRNG_SRC_INIT 32'h0000FFFF
-		#set TRNG_SRC_INIT 32'h0F0F0F0F
-		set init_value [list 0 1 0 0 1 1 0 0   0 1 1 1 0 0 0 0   1 1 1 1 0 0 0 0    0 1 1 1 1 1 0 0]
-	}
-	set config33s {
-		set BYTE_ALIGNED_SAMPLED_DATA {wire [31:0] byteAlignedSampledData = trng_sampled;}
-		set TRNG_NSRC 1
-		set TRNG_SRC_WIDTH 33
-		#set TRNG_SRC_INIT 33'h75_55_55_55
-		#set TRNG_SRC_INIT 33'h4C_70_F0_7C
-		set init_value [list 0    0 1 0 0 1 1 0 0   0 1 1 1 0 0 0 0   1 1 1 1 0 0 0 0    0 1 1 1 1 1 0 0]
-	}
-	eval $config4x7s
 } else {
 	#config to produce the best random numbers 
 	set TRNG_APP 1
@@ -90,15 +106,13 @@ if {$TRNG_TEST} {
 	#set TRNG_SRC_INIT 7'b1001010
 	set init_value [list 0 1 0 1 0 0 1]
 }
-
-set len [llength $init_value]
-set TRNG_SRC_INIT ""
-foreach bit $init_value {
-	append TRNG_SRC_INIT $bit
-}
-set TRNG_SRC_INIT "${len}'b[string reverse $TRNG_SRC_INIT]"
-
 if {$init_input} {
+	set len [llength $init_value]
+	set TRNG_SRC_INIT ""
+	foreach bit $init_value {
+		append TRNG_SRC_INIT $bit
+	}
+	set TRNG_SRC_INIT "${len}'b[string reverse $TRNG_SRC_INIT]"
 	#code will use TRNG_SRC_INIT
 	set init_value [list]
 }
@@ -120,7 +134,9 @@ module trng_top(
 
 localparam TRNG_NSRC = `$TRNG_NSRC`;
 localparam TRNG_SRC_WIDTH = `$TRNG_SRC_WIDTH`;
+``if {$init_input} {``
 localparam TRNG_SRC_INIT = `$TRNG_SRC_INIT`;
+``}``
 localparam TRNG_OUT_WIDTH = `$TRNG_OUT_WIDTH`;
 
 reg trng_reset;
@@ -306,11 +322,14 @@ always @(posedge i_clk) ext_clk1 <= ext_clk0;
 always @* o_spy_a = {ext_clk0,spy_a};
 always @* o_spy_b = {i_reset,spy_b};
 always @* o_spy_c = {ext_clk1,spy_c};*/
-``if {$TRNG_IMPL=="fake_trng"} {``
+``switch $TRNG_IMPL {
+	fake_trng {``
 fake_trng #(.WIDTH(TRNG_OUT_WIDTH),.NSRC(TRNG_NSRC), .SRC_WIDTH(TRNG_SRC_WIDTH))``
-} else {``
+	}
+	default {``
 `$TRNG_IMPL```
-}`` trng (
+	}
+} `` trng (
 	.i_reset(trng_reset),
 ``if {$init_input} {``	
 	.i_src_init_val(TRNG_SRC_INIT),
@@ -323,7 +342,9 @@ fake_trng #(.WIDTH(TRNG_OUT_WIDTH),.NSRC(TRNG_NSRC), .SRC_WIDTH(TRNG_SRC_WIDTH))
 );
 fake_trng #(.WIDTH(TRNG_OUT_WIDTH),.NSRC(TRNG_NSRC), .SRC_WIDTH(TRNG_SRC_WIDTH)) u_fake_trng (
 	.i_reset(1'b0),//we output o_sampled only during reset time...
-	.i_src_init_val(TRNG_SRC_INIT),
+``if {$init_input} {``	
+	.i_src_init_val(TRNG_SRC_INIT),//not used
+``}``	
 	.i_clk(i_clk),
 	.i_read(trng_read),
 	.o_dat(),
@@ -400,7 +421,9 @@ module fake_trng #(
 	parameter SRC_WIDTH = 5//size of each ring
 	)(
 	input wire i_reset,
+``if {$init_input} {``	
 	input wire [SRC_WIDTH-1:0] i_src_init_val,
+``}``	
 	input wire i_clk,
 	input wire i_read,
 	output reg [WIDTH-1:0] o_dat,
@@ -432,5 +455,12 @@ always @(posedge i_clk) begin
 end
 always @* o_valid = cnt==WIDTH;
 endmodule
-`async_trng_module async_trng $TRNG_OUT_WIDTH $TRNG_NSRC $TRNG_SRC_WIDTH $TRNG_OVERSAMPLING $init_value`
+``switch $TRNG_IMPL {
+	sb_trng {``
+`sb_trng_module sb_trng $TRNG_OUT_WIDTH $TRNG_NSRC $TRNG_SRC_WIDTH $TRNG_OVERSAMPLING`	
+``  }	
+	async_trng {``
+`async_trng_module async_trng $TRNG_OUT_WIDTH $TRNG_NSRC $TRNG_SRC_WIDTH $TRNG_OVERSAMPLING $TRNG_CRC_SAMPLING $init_value`
+``	}
+}``
 `backtick`default_nettype wire

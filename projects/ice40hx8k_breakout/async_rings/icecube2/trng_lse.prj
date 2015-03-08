@@ -36,6 +36,7 @@
 -ver "../../../../src/breakout/breakout_trng_top.v"
 -ver "../../../../src/ice40/ring_stage_ice40.v"
 -ver "../../../../src/ice40/trng_pll_96MHz.v"
+-ver "../../../../src/sbentsrc_rtl.v"
 -p "W:/trng/projects/ice40hx8k_breakout/async_rings/icecube2"
 
 #set result format/file last

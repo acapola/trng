@@ -4,7 +4,7 @@ Version=Lattice Semiconductor Corporation iCEcube - Release: 2014.04.26425 - Bui
 ProjectName=trng
 Vendor=SiliconBlue
 Synthesis=lse
-ProjectVFiles=../../../../src/trng_top.v=work,../../../../src/trng_com.v=work,../../../../src/auto_correlation.v=work,../../../../src/breakout/breakout_trng_top.v=work,../../../../src/ice40/ring_stage_ice40.v=work,../../../../src/ice40/trng_pll_96MHz.v=work
+ProjectVFiles=../../../../src/trng_top.v=work,../../../../src/trng_com.v=work,../../../../src/auto_correlation.v=work,../../../../src/breakout/breakout_trng_top.v=work,../../../../src/ice40/ring_stage_ice40.v=work,../../../../src/ice40/trng_pll_96MHz.v=work,../../../../src/sbentsrc_rtl.v
 ProjectCFiles=../contraints/timing100MHz_syn.sdc
 CurImplementation=trng_Implmnt
 Implementations=trng_Implmnt
