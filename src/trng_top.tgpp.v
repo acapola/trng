@@ -10,7 +10,11 @@ set TRNG_IMPL sb_trng
 set init_input 1
 #min is 1 (normal sampling)
 #max is 1K
-set TRNG_OVERSAMPLING 64
+set TRNG_OVERSAMPLING 1
+
+#set to 0 to observe the very first samples
+set RESET_GUARD_CYCLES 512
+	
 
 set TRNG_CRC_SAMPLING 1
 
@@ -292,6 +296,14 @@ always @(posedge i_clk) begin
 	else if(com_new_frame) o_dat_cnt <= o_dat_cnt + 1'b1;	
 end
 
+
+reg [15:0] reset_guard_cnt;
+wire reset_guard_time = `$RESET_GUARD_CYCLES` != reset_guard_cnt;
+always @(posedge i_clk) begin
+	if(i_reset | periodic_reset) reset_guard_cnt <= {16{1'b0}};
+	else if(reset_guard_time) reset_guard_cnt <= reset_guard_cnt + 1'b1;
+end
+
 ``if {$PERIODIC_RESET} {``
 reg [15:0] periodic_reset_cnt;
 wire fifo_emptied = (~ram_valid) & fifo_read_l1;//single cycle pulse
@@ -303,10 +315,10 @@ always @(posedge i_clk) begin
 	else if(fifo_emptied) periodic_reset_cnt <= periodic_reset_cnt + 1'b1;	
 end
 reg fifo_write;
-always @(posedge i_clk) fifo_write <= ~ram_valid & ~periodic_reset``if {$TRNG_RESET_TEST} {`` & trng_valid``}``;//fifo_write remains high for 1 cycle more than needed but fifo ignore it so no data is overwritten
+always @(posedge i_clk) fifo_write <= ~ram_valid & ~reset_guard_time & ~periodic_reset``if {$TRNG_RESET_TEST} {`` & trng_valid``}``;//fifo_write remains high for 1 cycle more than needed but fifo ignore it so no data is overwritten
 always @* trng_reset = i_reset | periodic_reset_l1;
 ``} else {``
-wire fifo_write = ~ram_valid;
+wire fifo_write = ~ram_valid & ~reset_guard_time;
 always @* trng_reset = i_reset;
 ``}``
 

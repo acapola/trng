@@ -59,6 +59,14 @@ always @(posedge i_clk) begin
 	else if(com_new_frame) o_dat_cnt <= o_dat_cnt + 1'b1;	
 end
 
+
+reg [15:0] reset_guard_cnt;
+wire reset_guard_time = 512 != reset_guard_cnt;
+always @(posedge i_clk) begin
+	if(i_reset | periodic_reset) reset_guard_cnt <= {16{1'b0}};
+	else if(reset_guard_time) reset_guard_cnt <= reset_guard_cnt + 1'b1;
+end
+
 reg [15:0] periodic_reset_cnt;
 wire fifo_emptied = (~ram_valid) & fifo_read_l1;//single cycle pulse
 wire periodic_reset = fifo_emptied & (periodic_reset_cnt==1);
@@ -69,7 +77,7 @@ always @(posedge i_clk) begin
 	else if(fifo_emptied) periodic_reset_cnt <= periodic_reset_cnt + 1'b1;	
 end
 reg fifo_write;
-always @(posedge i_clk) fifo_write <= ~ram_valid & ~periodic_reset & trng_valid;//fifo_write remains high for 1 cycle more than needed but fifo ignore it so no data is overwritten
+always @(posedge i_clk) fifo_write <= ~ram_valid & ~reset_guard_time & ~periodic_reset & trng_valid;//fifo_write remains high for 1 cycle more than needed but fifo ignore it so no data is overwritten
 always @* trng_reset = i_reset | periodic_reset_l1;
 
 wire [TRNG_NSRC*TRNG_SRC_WIDTH-1:0] trng_sampled;
@@ -231,7 +239,7 @@ module sb_trng (
 	output reg [8-1:0] o_dat,
 	output reg o_valid,
 	output wire [32-1:0] o_sampled
-);
+) /* synthesis syn_hier = "hard" */ ;
 
 // polynomial: (0 1 2 8)
 // data width: 32
@@ -257,29 +265,33 @@ function [7:0] nextCRC8_D32;
 		nextCRC8_D32 = newcrc;
 	end
 endfunction
-wire [7:0] crc_state = i_read & o_valid ? 8'h00 : o_dat;//start a new output byte, keep them independent
-wire [7:0] crc_sampled = nextCRC8_D32(o_sampled,crc_state);
 
+localparam NCRC = 1;
+localparam CRC_STATE_WIDTH = 8;
 localparam WIDTH = 8;
+reg [CRC_STATE_WIDTH-1:0] crc_state;
+wire [CRC_STATE_WIDTH-1:0] crc_input = i_read & o_valid ? {CRC_STATE_WIDTH{1'b0}} : crc_state;//start a new output byte, keep them independent
+wire [CRC_STATE_WIDTH-1:0] crc_sampled = nextCRC8_D32(o_sampled,crc_input);
+always @(*) o_dat = crc_state;
 localparam SRC_WIDTH = 32;
 localparam SAMPLED_WIDTH = 32;
-localparam TARGET_CNT = 64 * WIDTH /8;
+localparam TARGET_CNT = 1 * WIDTH /8;
 sbentsrc #(.RNG_WIDTH(SRC_WIDTH)) u0_rnd_src (.i_reset(i_reset), .i_clk(i_clk), .i_en(1'b1), .o_rnd(o_sampled[0*SRC_WIDTH+:SRC_WIDTH]));
-localparam CNT_WIDTH = 8;
+localparam CNT_WIDTH = 4;
 reg [CNT_WIDTH-1:0] cnt;
 reg [CNT_WIDTH-1:0] cnt2;	
 always @(posedge i_clk) begin
 	if(i_reset) begin
 		cnt <= {CNT_WIDTH{1'b0}};
 		cnt2 <= {CNT_WIDTH{1'b0}};
-		o_dat <= {WIDTH{1'b0}};
+		crc_state <= {CRC_STATE_WIDTH{1'b0}};
 	end else begin
 		if(i_read & o_valid) begin
 			cnt <= {CNT_WIDTH{1'b0}};
 			cnt2 <= {CNT_WIDTH{1'b0}};
-			o_dat <= crc_sampled;
+			crc_state <= crc_sampled;
 		end else begin
-			o_dat <= crc_sampled;
+			crc_state <= crc_sampled;
 			if(~o_valid) begin
 				cnt <= cnt + 1'b1;
 				if(cnt=={CNT_WIDTH{1'b1}}) cnt2 <= cnt2 + 1'b1;
