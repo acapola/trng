@@ -13,15 +13,15 @@ set init_input 1
 set TRNG_OVERSAMPLING 1
 
 #set to 0 to observe the very first samples
-set RESET_GUARD_CYCLES 512
+set RESET_GUARD_CYCLES 0
 	
 
 set TRNG_CRC_SAMPLING 1
 
 #select one test at most
 set TRNG_AUTOCO 0
-set TRNG_RAW 0
-set TRNG_RESET_TEST 1
+set TRNG_RAW 1
+set TRNG_RESET_TEST 0
 
 #AUTOCO parameters
 set AUTOCO_DELTA_WIDTH 6
@@ -37,7 +37,7 @@ set PERIODIC_RESET 0
 #RAW parameters
 if {$TRNG_RAW} {
 	set RAW_WIDTH_BYTES 4
-	set PERIODIC_RESET 64
+	set PERIODIC_RESET 1
 	set HAS_FIFO 1
 }
 

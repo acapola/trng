@@ -10,6 +10,110 @@ module sbentsrc #(
 	) /* synthesis syn_preserve = 1 */ ;
 
 wire ff_reset = RESET & i_reset;	
+
+function [3:0] sbox_f_hdminmax;
+//design criterias:
+//- invertible
+//- out->in sequence visit all states
+//- hamming distance between two consecutive states must be either 1 (the min) or 4 (the max)
+    input [3:0] in;
+    begin
+        case(in)
+        4'b0000: sbox_f_hdminmax = 4'b1111;//0->F, hd=4
+        4'b1111: sbox_f_hdminmax = 4'b1110;//F->E, hd=1
+        4'b1110: sbox_f_hdminmax = 4'b0001;//E->1, hd=4
+        4'b0001: sbox_f_hdminmax = 4'b0011;//1->3, hd=1
+        4'b0011: sbox_f_hdminmax = 4'b1100;//3->C, hd=4
+        4'b1100: sbox_f_hdminmax = 4'b1101;//C->D, hd=1
+        4'b1101: sbox_f_hdminmax = 4'b0010;//D->2, hd=4
+        4'b0010: sbox_f_hdminmax = 4'b0110;//2->6, hd=1
+        4'b0110: sbox_f_hdminmax = 4'b1001;//6->9, hd=4
+        4'b1001: sbox_f_hdminmax = 4'b1000;//9->8, hd=1
+        4'b1000: sbox_f_hdminmax = 4'b0111;//8->7, hd=4
+        4'b0111: sbox_f_hdminmax = 4'b0101;//7->5, hd=1
+        4'b0101: sbox_f_hdminmax = 4'b1010;//5->A, hd=4
+        4'b1010: sbox_f_hdminmax = 4'b1011;//A->B, hd=1
+        4'b1011: sbox_f_hdminmax = 4'b0100;//B->4, hd=4
+        4'b0100: sbox_f_hdminmax = 4'b0000;//4->0, hd=1   
+        endcase
+    end
+endfunction
+
+function [3:0] inv_sbox_f_hdminmax;
+    input [3:0] in;
+    begin
+        case(in)
+        4'b1111: inv_sbox_f_hdminmax = 4'b0000;//F->0, hd=4
+        4'b1110: inv_sbox_f_hdminmax = 4'b1111;//E->F, hd=1
+        4'b0001: inv_sbox_f_hdminmax = 4'b1110;//1->E, hd=4
+        4'b0011: inv_sbox_f_hdminmax = 4'b0001;//3->1, hd=1
+        4'b1100: inv_sbox_f_hdminmax = 4'b0011;//C->3, hd=4
+        4'b1101: inv_sbox_f_hdminmax = 4'b1100;//D->C, hd=1
+        4'b0010: inv_sbox_f_hdminmax = 4'b1101;//2->D, hd=4
+        4'b0110: inv_sbox_f_hdminmax = 4'b0010;//6->2, hd=1
+        4'b1001: inv_sbox_f_hdminmax = 4'b0110;//9->6, hd=4
+        4'b1000: inv_sbox_f_hdminmax = 4'b1001;//8->9, hd=1
+        4'b0111: inv_sbox_f_hdminmax = 4'b1000;//7->8, hd=4
+        4'b0101: inv_sbox_f_hdminmax = 4'b0111;//5->7, hd=1
+        4'b1010: inv_sbox_f_hdminmax = 4'b0101;//A->5, hd=4
+        4'b1011: inv_sbox_f_hdminmax = 4'b1010;//B->A, hd=1
+        4'b0100: inv_sbox_f_hdminmax = 4'b1011;//4->B, hd=4
+        4'b0000: inv_sbox_f_hdminmax = 4'b0100;//0->4, hd=1  
+        endcase
+    end
+endfunction
+
+function [3:0] sbox_f_hdvar;
+//design criterias:
+//- invertible
+//- out->in sequence visit all states
+//- hamming distance between two consecutive states must be a mixture of 1,2,3,4 
+    input [3:0] in;
+    begin
+        case(in)
+        4'b0000: sbox_f_hdvar = 4'b0011;//0->3, hd=2
+        4'b0011: sbox_f_hdvar = 4'b1100;//3->C, hd=4
+        4'b1100: sbox_f_hdvar = 4'b1010;//C->A, hd=2
+        4'b1010: sbox_f_hdvar = 4'b0001;//A->1, hd=3
+        4'b0001: sbox_f_hdvar = 4'b0110;//1->6, hd=3
+        4'b0110: sbox_f_hdvar = 4'b1001;//6->9, hd=4
+        4'b1001: sbox_f_hdvar = 4'b1000;//9->8, hd=1
+        4'b1000: sbox_f_hdvar = 4'b0101;//8->5, hd=3
+        4'b0101: sbox_f_hdvar = 4'b0100;//5->4, hd=1
+        4'b0100: sbox_f_hdvar = 4'b1101;//4->D, hd=2
+        4'b1101: sbox_f_hdvar = 4'b0010;//D->2, hd=4
+        4'b0010: sbox_f_hdvar = 4'b1111;//2->F, hd=3
+        4'b1111: sbox_f_hdvar = 4'b1110;//F->E, hd=1
+        4'b1110: sbox_f_hdvar = 4'b0111;//E->7, hd=2
+        4'b0111: sbox_f_hdvar = 4'b1011;//7->B, hd=2
+        4'b1011: sbox_f_hdvar = 4'b0000;//B->0, hd=3   
+        endcase
+    end
+endfunction
+
+function [3:0] inv_sbox_f_hdvar;
+    input [3:0] in;
+    begin
+        case(in)
+        4'b0011: inv_sbox_f_hdvar = 4'b0000;//3->0, hd=2
+        4'b1100: inv_sbox_f_hdvar = 4'b0011;//C->3, hd=4
+        4'b1010: inv_sbox_f_hdvar = 4'b1100;//A->C, hd=2
+        4'b0001: inv_sbox_f_hdvar = 4'b1010;//1->A, hd=3
+        4'b0110: inv_sbox_f_hdvar = 4'b0001;//6->1, hd=3
+        4'b1001: inv_sbox_f_hdvar = 4'b0110;//9->6, hd=4
+        4'b1000: inv_sbox_f_hdvar = 4'b1001;//8->9, hd=1
+        4'b0101: inv_sbox_f_hdvar = 4'b1000;//5->8, hd=3
+        4'b0100: inv_sbox_f_hdvar = 4'b0101;//4->5, hd=1
+        4'b1101: inv_sbox_f_hdvar = 4'b0100;//D->4, hd=2
+        4'b0010: inv_sbox_f_hdvar = 4'b1101;//2->D, hd=4
+        4'b1111: inv_sbox_f_hdvar = 4'b0010;//F->2, hd=3
+        4'b1110: inv_sbox_f_hdvar = 4'b1111;//E->F, hd=1
+        4'b0111: inv_sbox_f_hdvar = 4'b1110;//7->E, hd=2
+        4'b1011: inv_sbox_f_hdvar = 4'b0111;//B->7, hd=2
+        4'b0000: inv_sbox_f_hdvar = 4'b1011;//0->B, hd=3   
+        endcase
+    end
+endfunction
 	
 function [3:0] sbox_f_min_hd2;
 //design criterias:
@@ -120,14 +224,14 @@ endfunction
 function [3:0] sbox_f;
     input [3:0] in;
     begin
-        sbox_f = sbox_f_min_hd2(in);
+        sbox_f = sbox_f_hdminmax(in);
     end
 endfunction
 
 function [3:0] inv_sbox_f;
     input [3:0] in;
     begin
-        inv_sbox_f = inv_sbox_f_min_hd2(in);
+        inv_sbox_f = inv_sbox_f_hdminmax(in);
     end
 endfunction
 
