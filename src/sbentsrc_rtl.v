@@ -224,14 +224,14 @@ endfunction
 function [3:0] sbox_f;
     input [3:0] in;
     begin
-        sbox_f = sbox_f_hdminmax(in);
+        sbox_f = sbox_f_hdvar(in);
     end
 endfunction
 
 function [3:0] inv_sbox_f;
     input [3:0] in;
     begin
-        inv_sbox_f = inv_sbox_f_hdminmax(in);
+        inv_sbox_f = inv_sbox_f_hdvar(in);
     end
 endfunction
 

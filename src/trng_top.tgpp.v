@@ -13,14 +13,14 @@ set init_input 1
 set TRNG_OVERSAMPLING 1
 
 #set to 0 to observe the very first samples
-set RESET_GUARD_CYCLES 0
+set RESET_GUARD_CYCLES 512
 	
 
 set TRNG_CRC_SAMPLING 1
 
 #select one test at most
 set TRNG_AUTOCO 0
-set TRNG_RAW 1
+set TRNG_RAW 0
 set TRNG_RESET_TEST 0
 
 #AUTOCO parameters
@@ -33,6 +33,7 @@ set AUTOCO_MERGE 1
 #no periodic reset by default
 set PERIODIC_RESET 0
 #no fifo by default
+set HAS_FIFO 0
 
 #RAW parameters
 if {$TRNG_RAW} {
@@ -102,13 +103,24 @@ if {$TRNG_TEST} {
 	}
 } else {
 	#config to produce the best random numbers 
-	set TRNG_APP 1
-	set TRNG_TEST 0
+	switch $TRNG_IMPL {
+		sb_trng {
+			set init_input 0
+			set BYTE_ALIGNED_SAMPLED_DATA {wire [31:0] byteAlignedSampledData = trng_sampled;}
+			set TRNG_NSRC 1
+			set TRNG_SRC_WIDTH 32	
+		}
+		async_trng -
+		default {
+			set TRNG_APP 1
+			set TRNG_TEST 0
 
-	set TRNG_NSRC 4
-	set TRNG_SRC_WIDTH 7
-	#set TRNG_SRC_INIT 7'b1001010
-	set init_value [list 0 1 0 1 0 0 1]
+			set TRNG_NSRC 4
+			set TRNG_SRC_WIDTH 7
+			#set TRNG_SRC_INIT 7'b1001010
+			set init_value [list 0 1 0 1 0 0 1]
+		}
+	}
 }
 if {$init_input} {
 	set len [llength $init_value]
@@ -299,10 +311,6 @@ end
 
 reg [15:0] reset_guard_cnt;
 wire reset_guard_time = `$RESET_GUARD_CYCLES` != reset_guard_cnt;
-always @(posedge i_clk) begin
-	if(i_reset | periodic_reset) reset_guard_cnt <= {16{1'b0}};
-	else if(reset_guard_time) reset_guard_cnt <= reset_guard_cnt + 1'b1;
-end
 
 ``if {$PERIODIC_RESET} {``
 reg [15:0] periodic_reset_cnt;
@@ -317,10 +325,18 @@ end
 reg fifo_write;
 always @(posedge i_clk) fifo_write <= ~ram_valid & ~reset_guard_time & ~periodic_reset``if {$TRNG_RESET_TEST} {`` & trng_valid``}``;//fifo_write remains high for 1 cycle more than needed but fifo ignore it so no data is overwritten
 always @* trng_reset = i_reset | periodic_reset_l1;
-``} else {``
+``} else {
+	if {$HAS_FIFO} {``
 wire fifo_write = ~ram_valid & ~reset_guard_time;
+``	}``
 always @* trng_reset = i_reset;
 ``}``
+
+always @(posedge i_clk) begin
+	if(i_reset ``if {$PERIODIC_RESET} {``| periodic_reset``}``) reset_guard_cnt <= {16{1'b0}};
+	else if(reset_guard_time) reset_guard_cnt <= reset_guard_cnt + 1'b1;
+end
+
 
 wire [TRNG_NSRC*TRNG_SRC_WIDTH-1:0] trng_sampled;
 wire [TRNG_NSRC*TRNG_SRC_WIDTH-1:0] fake_trng_sampled;
