@@ -1,5 +1,5 @@
 ``
-proc sb_trng_module { name WIDTH NSRC SRC_WIDTH OVERSAMPLING } {
+proc conditioner_crc32d8_module { name WIDTH NSRC SRC_WIDTH OVERSAMPLING {entsrc sbentsrc} } {
 
 	set SAMPLED_WIDTH [expr $NSRC*$SRC_WIDTH]
 	#/* synthesis syn_hier = "hard" */
@@ -68,7 +68,7 @@ localparam SRC_WIDTH = `$SRC_WIDTH`;
 localparam SAMPLED_WIDTH = `$SAMPLED_WIDTH`;
 localparam TARGET_CNT = `$OVERSAMPLING` * WIDTH /8;
 ``for {set i 0} {$i<$NSRC} {incr i} {``
-sbentsrc #(.RNG_WIDTH(SRC_WIDTH)) u`$i`_rnd_src (.i_reset(i_reset), .i_clk(i_clk), .i_en(1'b1), .o_rnd(o_sampled[`$i`*SRC_WIDTH+:SRC_WIDTH]));
+`$entsrc` #(.RNG_WIDTH(SRC_WIDTH)) u`$i`_rnd_src (.i_reset(i_reset), .i_clk(i_clk), .i_en(1'b1), .o_rnd(o_sampled[`$i`*SRC_WIDTH+:SRC_WIDTH]));
 ``}``
 localparam CNT_WIDTH = 4;
 reg [CNT_WIDTH-1:0] cnt;

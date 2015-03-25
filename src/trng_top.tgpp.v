@@ -3,7 +3,8 @@
 ::tgpp::source async_trng_lib.tgpp.v
 ::tgpp::source sb_trng_lib.tgpp.v
 
-set TRNG_IMPL sb_trng
+set TRNG_IMPL lfsr_trng
+#set TRNG_IMPL sb_trng
 #set TRNG_IMPL async_trng
 #set TRNG_IMPL fake_trng
 
@@ -13,7 +14,7 @@ set init_input 1
 set TRNG_OVERSAMPLING 1
 
 #set to 0 to observe the very first samples
-set RESET_GUARD_CYCLES 512
+set RESET_GUARD_CYCLES 8
 	
 
 set TRNG_CRC_SAMPLING 1
@@ -21,7 +22,7 @@ set TRNG_CRC_SAMPLING 1
 #select one test at most
 set TRNG_AUTOCO 0
 set TRNG_RAW 0
-set TRNG_RESET_TEST 0
+set TRNG_RESET_TEST 1
 
 #AUTOCO parameters
 set AUTOCO_DELTA_WIDTH 6
@@ -61,6 +62,7 @@ set TRNG_TEST [expr $TRNG_AUTOCO | $TRNG_RAW | $TRNG_RESET_TEST]
 if {$TRNG_TEST} {
 #config to characterize the entropy source by recording the raw data in a FIFO
 	switch $TRNG_IMPL {
+		lfsr_trng -
 		sb_trng {
 			set init_input 0
 			set BYTE_ALIGNED_SAMPLED_DATA {wire [31:0] byteAlignedSampledData = trng_sampled;}
@@ -105,6 +107,12 @@ if {$TRNG_TEST} {
 	#config to produce the best random numbers 
 	switch $TRNG_IMPL {
 		sb_trng {
+			set init_input 0
+			set BYTE_ALIGNED_SAMPLED_DATA {wire [31:0] byteAlignedSampledData = trng_sampled;}
+			set TRNG_NSRC 1
+			set TRNG_SRC_WIDTH 32	
+		}
+		lfsr_trng {
 			set init_input 0
 			set BYTE_ALIGNED_SAMPLED_DATA {wire [31:0] byteAlignedSampledData = trng_sampled;}
 			set TRNG_NSRC 1
@@ -485,7 +493,10 @@ always @* o_valid = cnt==WIDTH;
 endmodule
 ``switch $TRNG_IMPL {
 	sb_trng {``
-`sb_trng_module sb_trng $TRNG_OUT_WIDTH $TRNG_NSRC $TRNG_SRC_WIDTH $TRNG_OVERSAMPLING`	
+`conditioner_crc32d8_module sb_trng $TRNG_OUT_WIDTH $TRNG_NSRC $TRNG_SRC_WIDTH $TRNG_OVERSAMPLING sbentsrc`	
+``  }	
+	lfsr_trng {``
+`conditioner_crc32d8_module lfsr_trng $TRNG_OUT_WIDTH $TRNG_NSRC $TRNG_SRC_WIDTH $TRNG_OVERSAMPLING lfsrentsrc`	
 ``  }	
 	async_trng {``
 `async_trng_module async_trng $TRNG_OUT_WIDTH $TRNG_NSRC $TRNG_SRC_WIDTH $TRNG_OVERSAMPLING $TRNG_CRC_SAMPLING $init_value`

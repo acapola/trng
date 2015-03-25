@@ -9,6 +9,7 @@ add_file -verilog -lib work "../../../../src/breakout/breakout_trng_top.v"
 add_file -verilog -lib work "../../../../src/ice40/ring_stage_ice40.v" 
 add_file -verilog -lib work "../../../../src/ice40/trng_pll_96MHz.v" 
 add_file -verilog -lib work "../../../../src/sbentsrc_rtl.v" 
+add_file -verilog -lib work "../../../../src/lfsrentsrc_rtl.v" 
 add_file -constraint -lib work "../contraints/timing100MHz_syn.sdc"
 #implementation: "trng_Implmnt"
 impl -add trng_Implmnt -type fpga
