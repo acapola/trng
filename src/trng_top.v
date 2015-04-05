@@ -19,26 +19,22 @@ localparam TRNG_OUT_WIDTH = 8;
 reg trng_reset;
 wire com_ready;	
 wire trng_valid;
-wire trng_read = trng_valid;
+reg ppout_buf_valid;
+reg [127:0] ppout_buf;
+wire [7:0] ppout_byte_buf = ppout_buf[0+:8];
+reg trng_read;
+wire ppout_byte_buf_read = com_ready & ppout_buf_valid;
 wire [7:0] trng_dat;
 wire com_new_frame;
 reg send;
 reg [7:0] to_send;
-wire [7:0] fifo_out;
-reg ram_valid;
-reg fifo_read_l1;
-wire fifo_read = com_ready & ram_valid & ~fifo_read_l1;//read only when we have filled the fifo and com do a read
 always @(posedge i_clk) begin
 	if(i_reset) begin
 		send <= 1'b0;
-		fifo_read_l1 <= 1'b0;
 	end else begin
-		if(fifo_read_l1) begin
-			fifo_read_l1 <= 1'b0;
+		if(com_ready & ppout_buf_valid) begin
 			send <= 1'b1;
-			to_send <= fifo_out;
-		end else if(fifo_read) begin
-			fifo_read_l1 <= 1'b1;
+			to_send <= ppout_byte_buf;
 		end else send <= 1'b0;
 	end
 end
@@ -61,23 +57,12 @@ end
 
 
 reg [15:0] reset_guard_cnt;
-wire reset_guard_time = 8 != reset_guard_cnt;
+wire reset_guard_time = 128 != reset_guard_cnt;
 
-reg [15:0] periodic_reset_cnt;
-wire fifo_emptied = (~ram_valid) & fifo_read_l1;//single cycle pulse
-wire periodic_reset = fifo_emptied & (periodic_reset_cnt==1);
-reg periodic_reset_l1;
-always @(posedge i_clk) periodic_reset_l1 <= periodic_reset;//register to have at least one full clock cycle to reset the trng
-always @(posedge i_clk) begin
-	if(i_reset | periodic_reset) periodic_reset_cnt <= {{15{1'b0}},1'b1};
-	else if(fifo_emptied) periodic_reset_cnt <= periodic_reset_cnt + 1'b1;	
-end
-reg fifo_write;
-always @(posedge i_clk) fifo_write <= ~ram_valid & ~reset_guard_time & ~periodic_reset & trng_valid;//fifo_write remains high for 1 cycle more than needed but fifo ignore it so no data is overwritten
-always @* trng_reset = i_reset | periodic_reset_l1;
+always @* trng_reset = i_reset;
 
 always @(posedge i_clk) begin
-	if(i_reset | periodic_reset) reset_guard_cnt <= {16{1'b0}};
+	if(i_reset ) reset_guard_cnt <= {16{1'b0}};
 	else if(reset_guard_time) reset_guard_cnt <= reset_guard_cnt + 1'b1;
 end
 
@@ -111,91 +96,76 @@ fake_trng #(.WIDTH(TRNG_OUT_WIDTH),.NSRC(TRNG_NSRC), .SRC_WIDTH(TRNG_SRC_WIDTH))
 	.o_valid(),
 	.o_sampled(fake_trng_sampled)
 );
+function [70:0] lfsr71Func;
+    input [70:0] in;
+    integer i;
+    reg [70:0] out;
+    reg [70:0] tmp;
+    begin
+        tmp = in;
+        //for(i=0;i<BITS_PER_CYCLE;i=i+1) begin
+            out[70] = tmp[0] ^ tmp[6];
+            out[70-1:0] = tmp[70:1];
+            tmp = out;
+        //end
+        lfsr71Func = out;
+    end
+endfunction
+reg [127:0] ppin;
+reg [4:0] ppin_level;
+wire [127:0] ppout;
+reg [4:0] ppout_buf_level;
+always @* ppout_buf_valid = ppout_buf_level != 0;
+wire ppin_read;
+wire ppout_valid;
+wire ppout_read = ppout_valid;
+wire ppin_valid = ppin_level==16;
+always @* trng_read = trng_valid;
 
-
-
-localparam FIFO_IN_WIDTH_BYTES = 1;
-localparam FIFO_DEPTH_WIDTH = 14;
-//we store sampled data in ram until its full and then dump the full memory
-reg [FIFO_IN_WIDTH_BYTES*8-1:0] fifo_in;
-always @(posedge i_clk) fifo_in <= trng_dat[FIFO_IN_WIDTH_BYTES*8-1:0];//pipeline reg because fifo_write is delayed as well
-wire fifo_empty,fifo_full;
-fifo #(
-	.DEPTH_WIDTH(FIFO_DEPTH_WIDTH)//16384 bytes FIFO
-	) u_fifo (
-	.i_reset(i_reset),
-	.i_clk(i_clk),
-	.i_write(fifo_write),
-	.i_read(fifo_read),
-	.i_dat(fifo_in),
-	.o_dat(fifo_out),
-	.o_almost_empty(fifo_empty),
-	.o_full(fifo_full)
-	);
+wire ppout_buf_read = com_ready;
 always @(posedge i_clk) begin
 	if(i_reset) begin
-		ram_valid <= 1'b0;//0 when we fill the fifo, 1 when we empty it
+		ppout_buf <= {128{1'b0}};
+		ppout_buf_level <= 0;
 	end else begin
-		if(ram_valid) begin //we read the fifo, once per com byte
-			if(fifo_read) begin
-				ram_valid <= ~fifo_empty;
-			end
-		end else begin//we fill the fifo, once per clock
-			ram_valid <= fifo_full;
+		if(ppout_valid) begin
+			ppout_buf <= ppout;
+			ppout_buf_level <= 16;
+		end else if(ppout_byte_buf_read) begin
+			ppout_buf <= {ppout_buf[0+:8],ppout_buf[8+:120]};
+			ppout_buf_level <= ppout_buf_level - 1'b1;
 		end
 	end
 end
-
-endmodule
-module fifo #(
-	parameter DEPTH_WIDTH = 10,
-	//fixed parameters
-	parameter OUT_WIDTH = 8,
-	parameter IN_WIDTH = 8
-	)(
-	input wire i_reset,
-	input wire i_clk,
-	input wire i_write,
-	input wire i_read,
-	input wire [IN_WIDTH-1:0] i_dat,
-	output reg [OUT_WIDTH-1:0] o_dat,
-	output reg o_almost_empty,//can read one more time
-	output reg o_empty,//cant read
-	output reg o_almost_full,//can write one more time
-	output reg o_full//can't write
-	);
-localparam DEPTH = 1 << DEPTH_WIDTH;
-//assume a RAM for implementation of storage => don't use shift reg structure, use addresses	
-reg [IN_WIDTH-1:0] storage[DEPTH-1:0];
-reg [DEPTH_WIDTH-1:0] write_addr;
-reg [DEPTH_WIDTH-1:0] read_addr;
-wire [DEPTH_WIDTH-1:0] next_write_addr = write_addr + 1'b1;
-wire [DEPTH_WIDTH-1:0] next_read_addr = read_addr + 1'b1;
-always @* o_almost_empty = next_read_addr == write_addr;
-always @* o_almost_full = next_write_addr == read_addr;
 always @(posedge i_clk) begin
 	if(i_reset) begin
-		o_full <= 1'b0;
-		o_empty <= 1'b1;
-		write_addr <= {DEPTH_WIDTH{1'b0}};
-		read_addr <= {DEPTH_WIDTH{1'b0}};
+		ppin <= {128{1'b0}};
+		ppin_level <= 0;
 	end else begin
-		if(i_write & ~o_full) begin
-			o_empty <= 1'b0;
-			o_full <= o_almost_full;
-			write_addr <= next_write_addr;
-			storage[write_addr] <= i_dat;
-		end else if(i_read & ~o_empty) begin //priority to write, allow to use single port RAMs
-			o_empty <= o_almost_empty;
-			o_full <= 1'b0;
-			read_addr <= next_read_addr;
-			o_dat <= storage[read_addr];
+		if(ppin_read) begin
+			ppin <= {trng_valid ? trng_dat : 8'h00,{128-8-71{1'b0}},lfsr71Func(ppout_buf[8+:71])};
+			ppin_level <= 0;
+		end else if(trng_valid) begin
+			ppin <= {ppin[0+:TRNG_OUT_WIDTH] ^ trng_dat,ppin[TRNG_OUT_WIDTH+:128-TRNG_OUT_WIDTH]};
+			if(~ppin_valid) ppin_level <= ppin_level + 1'b1;
 		end
 	end
 end
+aespp u_aespp(
+  .i_reset(i_reset),
+  .i_clk(i_clk),
+  .i_valid(ppin_valid),
+  .i_read(ppout_read),
+  .i_blocks(4'h2),
+  .i_dat(ppin),
+  .o_dat(ppout),
+  .o_input_consummed(ppin_read),
+  .o_valid(ppout_valid)
+);
+
+
+
 endmodule
-
-
 
 module fake_trng #(
 	parameter WIDTH = 8,//max is 255
@@ -225,14 +195,14 @@ always @(posedge i_clk) begin
 	end else begin
 		if(i_read & o_valid) begin
 			cnt <= {CNT_WIDTH{1'b0}};
-			o_dat <= {WIDTH{1'b0}};
+			o_dat <= o_dat+1'b1;
 		end else begin
-			o_dat <= o_dat+1'b1;//o_sampled[7:0];
-			if(~o_valid) cnt <= cnt + 1'b1;
+			//o_dat <= o_dat+1'b1;//o_sampled[7:0];
+			//if(~o_valid) cnt <= cnt + 1'b1;
 		end
 	end
 end
-always @* o_valid = cnt==WIDTH;
+always @* o_valid = 1;//cnt==WIDTH;
 endmodule
 module lfsr_trng (
 	input wire i_reset,

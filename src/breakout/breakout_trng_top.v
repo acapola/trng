@@ -7,7 +7,9 @@ module breakout_trng_top(
 	//input wire i_serial_data,
 	input wire i_serial_rts_n,
 	output wire o_serial_data,
-	output reg [4:0] o_led/*,
+	output reg [4:0] o_led
+	//,output wire CLKOP
+	/*,
     output wire [7:0] o_spy_a,
 	output wire [7:0] o_spy_b,
 	output wire [7:0] o_spy_c*/

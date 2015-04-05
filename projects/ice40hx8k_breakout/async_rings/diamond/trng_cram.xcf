@@ -20,11 +20,12 @@
 				<BScanVal>0</BScanVal>
 			</Bypass>
 			<File>W:/trng/projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/outputs/bitmap/breakout_trng_top_bitmap.hex</File>
-			<FileTime>03/08/15 11:46:41</FileTime>
+			<FileTime>04/04/15 23:53:11</FileTime>
 			<Operation>Fast Program</Operation>
 			<Option>
 				<SVFVendor>JTAG STANDARD</SVFVendor>
 				<IOState>HighZ</IOState>
+				<SVFProcessor>SVF Processor</SVFProcessor>
 				<AccessMode>CRAM</AccessMode>
 			</Option>
 		</Device>

@@ -22,7 +22,7 @@ set TRNG_CRC_SAMPLING 1
 #select one test at most
 set TRNG_AUTOCO 0
 set TRNG_RAW 0
-set TRNG_RESET_TEST 1
+set TRNG_RESET_TEST 0
 
 #AUTOCO parameters
 set AUTOCO_DELTA_WIDTH 6
@@ -35,6 +35,8 @@ set AUTOCO_MERGE 1
 set PERIODIC_RESET 0
 #no fifo by default
 set HAS_FIFO 0
+#no AES by default
+set HAS_AESPP 0
 
 #RAW parameters
 if {$TRNG_RAW} {
@@ -120,15 +122,16 @@ if {$TRNG_TEST} {
 		}
 		async_trng -
 		default {
-			set TRNG_APP 1
-			set TRNG_TEST 0
-
 			set TRNG_NSRC 4
 			set TRNG_SRC_WIDTH 7
 			#set TRNG_SRC_INIT 7'b1001010
 			set init_value [list 0 1 0 1 0 0 1]
 		}
 	}
+	set TRNG_APP 1
+	set TRNG_TEST 0		
+	set HAS_AESPP 1
+	set RESET_GUARD_CYCLES 128
 }
 if {$init_input} {
 	set len [llength $init_value]
@@ -166,10 +169,25 @@ localparam TRNG_OUT_WIDTH = `$TRNG_OUT_WIDTH`;
 reg trng_reset;
 wire com_ready;	
 wire trng_valid;
+``if {$HAS_AESPP} {
+	set random_dat ppout_byte_buf
+	set random_valid ppout_buf_valid
+	set random_read ppout_byte_buf_read
+	``
+reg ppout_buf_valid;
+reg [127:0] ppout_buf;
+wire [7:0] `$random_dat` = ppout_buf[0+:8];
+reg trng_read;
+	``
+} else {
+	set random_dat trng_dat
+	set random_valid trng_valid
+	set random_read trng_read
+}``
 ``if {$HAS_FIFO} {``
-wire trng_read = trng_valid;
+wire `$random_read` = trng_valid;
 ``} else {``
-wire trng_read = com_ready;
+wire `$random_read` = com_ready & `$random_valid`;
 ``}``
 wire [7:0] trng_dat;
 wire com_new_frame;
@@ -292,9 +310,9 @@ always @(posedge i_clk) begin
 	if(i_reset) begin
 		send <= 1'b0;
 	end else begin
-		if(com_ready & trng_valid) begin
+		if(com_ready & `$random_valid`) begin
 			send <= 1'b1;
-			to_send <= trng_dat;
+			to_send <= `$random_dat`;
 		end else send <= 1'b0;
 	end
 end
@@ -331,7 +349,7 @@ always @(posedge i_clk) begin
 	else if(fifo_emptied) periodic_reset_cnt <= periodic_reset_cnt + 1'b1;	
 end
 reg fifo_write;
-always @(posedge i_clk) fifo_write <= ~ram_valid & ~reset_guard_time & ~periodic_reset``if {$TRNG_RESET_TEST} {`` & trng_valid``}``;//fifo_write remains high for 1 cycle more than needed but fifo ignore it so no data is overwritten
+always @(posedge i_clk) fifo_write <= ~ram_valid & ~reset_guard_time & ~periodic_reset``if {$TRNG_RESET_TEST} {`` & `$random_valid```}``;//fifo_write remains high for 1 cycle more than needed but fifo ignore it so no data is overwritten
 always @* trng_reset = i_reset | periodic_reset_l1;
 ``} else {
 	if {$HAS_FIFO} {``
@@ -387,7 +405,78 @@ fake_trng #(.WIDTH(TRNG_OUT_WIDTH),.NSRC(TRNG_NSRC), .SRC_WIDTH(TRNG_SRC_WIDTH))
 	.o_valid(),
 	.o_sampled(fake_trng_sampled)
 );
+``if {$HAS_AESPP} {``
+function [70:0] lfsr71Func;
+    input [70:0] in;
+    integer i;
+    reg [70:0] out;
+    reg [70:0] tmp;
+    begin
+        tmp = in;
+        //for(i=0;i<BITS_PER_CYCLE;i=i+1) begin
+            out[70] = tmp[0] ^ tmp[6];
+            out[70-1:0] = tmp[70:1];
+            tmp = out;
+        //end
+        lfsr71Func = out;
+    end
+endfunction
+reg [127:0] ppin;
+reg [4:0] ppin_level;
+wire [127:0] ppout;
+reg [4:0] ppout_buf_level;
+always @* ppout_buf_valid = ppout_buf_level != 0;
+wire ppin_read;
+wire ppout_valid;
+wire ppout_read = ppout_valid;
+wire ppin_valid = ppin_level==16;
+always @* trng_read = trng_valid;
 
+``if {$HAS_FIFO} {``
+wire ppout_buf_read = ppout_buf_valid;
+``} else {``
+wire ppout_buf_read = com_ready;
+``}``
+always @(posedge i_clk) begin
+	if(i_reset) begin
+		ppout_buf <= {128{1'b0}};
+		ppout_buf_level <= 0;
+	end else begin
+		if(ppout_valid) begin
+			ppout_buf <= ppout;
+			ppout_buf_level <= 16;
+		end else if(ppout_byte_buf_read) begin
+			ppout_buf <= {ppout_buf[0+:8],ppout_buf[8+:120]};
+			ppout_buf_level <= ppout_buf_level - 1'b1;
+		end
+	end
+end
+always @(posedge i_clk) begin
+	if(i_reset) begin
+		ppin <= {128{1'b0}};
+		ppin_level <= 0;
+	end else begin
+		if(ppin_read) begin
+			ppin <= {trng_valid ? trng_dat : 8'h00,{128-8-71{1'b0}},lfsr71Func(ppout_buf[8+:71])};
+			ppin_level <= 0;
+		end else if(trng_valid) begin
+			ppin <= {ppin[0+:TRNG_OUT_WIDTH] ^ trng_dat,ppin[TRNG_OUT_WIDTH+:128-TRNG_OUT_WIDTH]};
+			if(~ppin_valid) ppin_level <= ppin_level + 1'b1;
+		end
+	end
+end
+aespp u_aespp(
+  .i_reset(i_reset),
+  .i_clk(i_clk),
+  .i_valid(ppin_valid),
+  .i_read(ppout_read),
+  .i_blocks(4'h2),
+  .i_dat(ppin),
+  .o_dat(ppout),
+  .o_input_consummed(ppin_read),
+  .o_valid(ppout_valid)
+);
+``}``
 
 
 ``if {$TRNG_RAW | $TRNG_RESET_TEST} {
@@ -408,7 +497,7 @@ localparam FIFO_DEPTH_WIDTH = `$FIFO_DEPTH_WIDTH`;
 wire [FIFO_IN_WIDTH_BYTES*8-1:0] fifo_in = byteAlignedSampledData[FIFO_IN_WIDTH_BYTES*8-1:0];
 ``} else {``
 reg [FIFO_IN_WIDTH_BYTES*8-1:0] fifo_in;
-always @(posedge i_clk) fifo_in <= trng_dat[FIFO_IN_WIDTH_BYTES*8-1:0];//pipeline reg because fifo_write is delayed as well
+always @(posedge i_clk) fifo_in <= `$random_dat`[FIFO_IN_WIDTH_BYTES*8-1:0];//pipeline reg because fifo_write is delayed as well
 ``}``
 wire fifo_empty,fifo_full;
 fifo #(
@@ -482,14 +571,14 @@ always @(posedge i_clk) begin
 	end else begin
 		if(i_read & o_valid) begin
 			cnt <= {CNT_WIDTH{1'b0}};
-			o_dat <= {WIDTH{1'b0}};
+			o_dat <= o_dat+1'b1;
 		end else begin
-			o_dat <= o_dat+1'b1;//o_sampled[7:0];
-			if(~o_valid) cnt <= cnt + 1'b1;
+			//o_dat <= o_dat+1'b1;//o_sampled[7:0];
+			//if(~o_valid) cnt <= cnt + 1'b1;
 		end
 	end
 end
-always @* o_valid = cnt==WIDTH;
+always @* o_valid = 1;//cnt==WIDTH;
 endmodule
 ``switch $TRNG_IMPL {
 	sb_trng {``

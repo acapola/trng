@@ -11,15 +11,15 @@ output wire PLLOUTGLOBAL;
 SB_PLL40_CORE trng_pll_96MHz_inst(.REFERENCECLK(REFERENCECLK),
                                   .PLLOUTCORE(PLLOUTCORE),
                                   .PLLOUTGLOBAL(PLLOUTGLOBAL),
-                                  .EXTFEEDBACK(),
-                                  .DYNAMICDELAY(),
+                                  .EXTFEEDBACK(1'b0),
+                                  .DYNAMICDELAY(0),
                                   .RESETB(RESET),
                                   .BYPASS(1'b0),
-                                  .LATCHINPUTVALUE(),
+                                  .LATCHINPUTVALUE(0),
                                   .LOCK(),
-                                  .SDI(),
+                                  .SDI(0),
                                   .SDO(),
-                                  .SCLK());
+                                  .SCLK(0));
 
 //\\ Fin=12, Fout=96;
 defparam trng_pll_96MHz_inst.DIVR = 4'b0000;
