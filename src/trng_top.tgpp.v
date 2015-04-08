@@ -3,10 +3,10 @@
 ::tgpp::source async_trng_lib.tgpp.v
 ::tgpp::source sb_trng_lib.tgpp.v
 
-set TRNG_IMPL lfsr_trng
+#set TRNG_IMPL lfsr_trng
 #set TRNG_IMPL sb_trng
 #set TRNG_IMPL async_trng
-#set TRNG_IMPL fake_trng
+set TRNG_IMPL fake_trng
 
 set init_input 1
 #min is 1 (normal sampling)
@@ -130,7 +130,7 @@ if {$TRNG_TEST} {
 	}
 	set TRNG_APP 1
 	set TRNG_TEST 0		
-	set HAS_AESPP 1
+	set HAS_AESPP 0
 	set RESET_GUARD_CYCLES 128
 }
 if {$init_input} {
