@@ -41,3 +41,6 @@ projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/outputs/gui/tr
 projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/trng_XXXXXOLD.edf
 projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/sbt/Log/iceCube2.log
 projects/ice40hx8k_breakout/async_rings/icecube2/trng_Implmnt/trng_XXXXXOLD.scf
+*.sh~
+projects/icestick/doc/Thumbs.db
+projects/icestick/application_notes_software/linux_tty/etc/udev/rules.d/98-kidekin.rules~
