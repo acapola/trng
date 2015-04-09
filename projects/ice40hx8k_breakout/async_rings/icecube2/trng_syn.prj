@@ -63,3 +63,4 @@ project -result_format "edif"
 project -result_file ./trng_Implmnt/trng.edf
 project -log_file "./trng_Implmnt/trng.srr"
 impl -active trng_Implmnt
+project -run synthesis -clean

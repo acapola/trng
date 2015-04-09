@@ -4,7 +4,7 @@ Version=Lattice Semiconductor Corporation iCEcube - Release: 2014.12.27052 - Bui
 ProjectName=trng
 Vendor=SiliconBlue
 Synthesis=lse
-ProjectVFiles=../../../../src/trng_top.v=work,../../../../src/trng_com.v=work,../../../../src/auto_correlation.v=work,../../../../src/breakout/breakout_trng_top.v=work,../../../../src/ice40/ring_stage_ice40.v=work,../../../../src/ice40/trng_pll_96MHz.v=work,../../../../src/sbentsrc_rtl.v=work,../../../../src/lfsrentsrc_rtl.v=work,../../../../src/aes_ref.v=work,../../../../src/aespp_rtl.v=work
+ProjectVFiles=../../../../src/trng_top.v=work,../../../../src/trng_com.v=work,../../../../src/ice40/trng_pll_96MHz.v=work,../../../../src/lfsrentsrc_rtl.v=work,../../../../src/aes_ref.v=work,../../../../src/aespp_rtl.v=work,../../../../src/icestick/icestick_trng_top.v=work
 ProjectCFiles=../contraints/timing100MHz_syn.sdc
 CurImplementation=trng_Implmnt
 Implementations=trng_Implmnt
@@ -32,7 +32,7 @@ RemoveDuplicateRegisters=True
 ResolvedMixedDrivers=False
 ResourceSharing=False
 TargetFrequency=200
-TopLevelUnit=breakout_trng_top
+TopLevelUnit=icestick_trng_top
 UseIORegister=Auto
 VHDL2008=False
 VerilogIncludeSearchPath=
@@ -58,19 +58,19 @@ HookTo3rdPartyTextEditor=yes
 
 [trng_Implmnt]
 DeviceFamily=iCE40
-Device=HX8K
-DevicePackage=CT256
+Device=HX1K
+DevicePackage=TQ144
 DevicePower=
 NetlistFile=trng_Implmnt/trng.edf
 AdditionalEDIFFile=
 IPEDIFFile=
-DesignLib=trng_Implmnt/sbt/netlist/oadb-breakout_trng_top
+DesignLib=trng_Implmnt/sbt/netlist/oadb-icestick_trng_top
 DesignView=_rt
-DesignCell=breakout_trng_top
+DesignCell=icestick_trng_top
 SynthesisSDCFile=trng_Implmnt/trng.scf
 UserPinConstraintFile=
 UserSDCFile=../contraints/timing100MHz.sdc
-PhysicalConstraintFile=../contraints/breakout_trng_top_pcf_sbt.pcf
+PhysicalConstraintFile=../contraints/icestick_trng.pcf
 BackendImplPathName=
 Devicevoltage=1.14
 DevicevoltagePerformance=+/-5%(datasheet default)

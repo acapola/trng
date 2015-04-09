@@ -1,5 +1,6 @@
 ``
 set COMTEST 0
+set RAW_BYTES 1
 set MHZ 1000000
 #set TARGET_BAUDRATE 115200.0
 #set TARGET_BAUDRATE 921600.0
@@ -25,6 +26,7 @@ module trng_com(
 	output reg o_new_frame
 	);
 	
+	
 localparam TARGET_BAUDRATE = `$TARGET_BAUDRATE`;
 localparam CLK_HZ = `$CLK_HZ`;
 localparam ONE_SEC_IN_NS = `$ONE_SEC_IN_NS`;
@@ -32,7 +34,25 @@ localparam TARGET_BIT_PERIOD_NS = `$TARGET_BIT_PERIOD_NS`;
 localparam CLK_PERIOD_NS = `$CLK_PERIOD_NS`;
 localparam CYCLES_PER_BIT_FLOAT = `$CYCLES_PER_BIT_FLOAT`;
 localparam CYCLES_PER_BIT = `$CYCLES_PER_BIT`;
+	
+``if {$RAW_BYTES} {``
+wire tx_ready;
+always @* begin	
+	o_ready = tx_ready & ~i_write;
+	o_new_frame = i_write;
+end
+tx u_tx(
+	.i_reset(i_reset),
+	.i_clk(i_clk),
+	.i_cycles_per_bit(CYCLES_PER_BIT),
+	.i_write(i_write),
+	.i_dat(i_dat),
+	.i_rts_n(i_serial_rts_n),
+	.o_sout(o_serial_data),
+	.o_ready(tx_ready)
+	);
 
+``} else {``
 function [31:0] f_reverse32;
     input [31:0] in;
     reg [31:0] tmp;
@@ -173,7 +193,9 @@ always @(posedge i_clk) begin
 		ready <= tx_ready & ~tx_write;
 	end
 end
+``}``
 endmodule
+
 
 //simple protocol layer to send data by packets of up to 127 bytes
 //over the trng_com protocol
