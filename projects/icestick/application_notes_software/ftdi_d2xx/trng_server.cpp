@@ -48,8 +48,8 @@ int main(int argc, char* argv[])
 	} catch (exception& e){
 		cerr << "Exception: " << e.what() << "\n";
 		return 3;
-	} catch (std::string& s){
-		cerr << "Exception: " << s <<"\n";
+	} catch (std::string* s){
+		cerr << "Exception: " << *s <<"\n";
 		return 4;
 	}
 
