@@ -17,8 +17,8 @@
 				<BScanLen>1</BScanLen>
 				<BScanVal>0</BScanVal>
 			</Bypass>
-			<File>W:/trng/projects/icestick/hardware/icecube2/trng_Implmnt/sbt/outputs/bitmap/icestick_trng_top_bitmap.hex</File>
-			<FileTime>04/09/15 22:54:04</FileTime>
+			<File>W:/trng/projects/icestick/hardware/trng_bb/trng_Implmnt/sbt/outputs/bitmap/icestick_trng_top_bitmap.hex</File>
+			<FileTime>04/12/15 23:09:22</FileTime>
 			<Operation>SPI Flash Erase,Program,Verify</Operation>
 			<Option>
 				<SVFVendor>JTAG STANDARD</SVFVendor>
@@ -59,11 +59,11 @@
 					<IDCode>0x16</IDCode>
 					<Package>8-pin VDFPN8</Package>
 					<Operation>SPI Flash Erase,Program,Verify</Operation>
-					<File>W:/trng/projects/icestick/hardware/icecube2/trng_Implmnt/sbt/outputs/bitmap/icestick_trng_top_bitmap.hex</File>
+					<File>W:/trng/projects/icestick/hardware/trng_bb/trng_Implmnt/sbt/outputs/bitmap/icestick_trng_top_bitmap.hex</File>
 					<AddressBase>0x00000000</AddressBase>
 					<EndAddress>0x00010000</EndAddress>
 					<DeviceSize>32</DeviceSize>
-					<DataSize>32298</DataSize>
+					<DataSize>32299</DataSize>
 					<NumberOfDevices>1</NumberOfDevices>
 					<ReInitialize value="FALSE"/>
 				</Device>

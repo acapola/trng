@@ -1,0 +1,132 @@
+# ##############################################################################
+
+# iCEcube PCF
+
+# Version:            2014.12.27052
+
+# File Generated:     Apr 12 2015 22:23:54
+
+# Family & Device:    iCE40HX1K
+
+# Package:            TQ144
+
+# ##############################################################################
+
+###BLE List 90
+ble_pack T_1_16_logic_cluster_lc_7 {IN_0__u_frlsfr4.i1_3_lut_4_lut}
+ble_pack T_2_13_logic_cluster_lc_6 {o_rnd_i17}
+ble_pack T_1_11_logic_cluster_lc_1 {IN_6__u_frlsfr4.i1_3_lut_adj_1}
+ble_pack T_1_13_logic_cluster_lc_4 {IN_3__u_frlsfr4.i233_4_lut}
+ble_pack T_1_10_logic_cluster_lc_3 {IN_7__u_frlsfr4.i40_2_lut_4_lut}
+ble_pack T_1_15_logic_cluster_lc_3 {IN_1__u_frlsfr4.i29_2_lut_4_lut}
+ble_pack T_2_12_logic_cluster_lc_5 {o_rnd_i22}
+ble_pack T_2_16_logic_cluster_lc_3 {o_rnd_i4}
+ble_pack T_1_12_logic_cluster_lc_0 {IN_6__u_frlsfr4.i273_4_lut}
+ble_pack T_1_14_logic_cluster_lc_3 {IN_2__u_frlsfr4.i1_3_lut_4_lut}
+ble_pack T_2_13_logic_cluster_lc_3 {IN_4__u_frlsfr4.i22_4_lut}
+ble_pack T_2_14_logic_cluster_lc_5 {o_rnd_i10}
+ble_pack T_1_11_logic_cluster_lc_4 {IN_6__u_frlsfr4.i22_4_lut}
+ble_pack T_1_13_logic_cluster_lc_0 {IN_4__u_frlsfr4.i245_4_lut}
+ble_pack T_2_12_logic_cluster_lc_0 {o_rnd_i27}
+ble_pack T_2_16_logic_cluster_lc_6 {o_rnd_i1}
+ble_pack T_1_10_logic_cluster_lc_7 {IN_7__u_frlsfr4.i285_4_lut}
+ble_pack T_1_12_logic_cluster_lc_5 {IN_5__u_frlsfr4.i261_4_lut}
+ble_pack T_1_14_logic_cluster_lc_4 {IN_2__u_frlsfr4.i229_4_lut}
+ble_pack T_1_15_logic_cluster_lc_7 {IN_1__u_frlsfr4.i209_4_lut}
+ble_pack T_2_10_logic_cluster_lc_6 {o_rnd_i29}
+ble_pack T_1_13_logic_cluster_lc_2 {IN_4__u_frlsfr4.i249_4_lut}
+ble_pack T_1_16_logic_cluster_lc_0 {IN_1__u_frlsfr4.i168_4_lut}
+ble_pack T_2_12_logic_cluster_lc_2 {o_rnd_i25}
+ble_pack T_2_13_logic_cluster_lc_7 {o_rnd_i16}
+ble_pack T_2_14_logic_cluster_lc_1 {o_rnd_i14}
+ble_pack T_2_16_logic_cluster_lc_0 {o_rnd_i7}
+ble_pack T_1_11_logic_cluster_lc_0 {IN_7__u_frlsfr4.i56_3_lut_4_lut}
+ble_pack T_1_12_logic_cluster_lc_3 {IN_5__u_frlsfr4.i50_3_lut_4_lut}
+ble_pack T_1_14_logic_cluster_lc_6 {IN_2__u_frlsfr4.i221_4_lut}
+ble_pack T_1_15_logic_cluster_lc_5 {IN_1__u_frlsfr4.i213_4_lut}
+ble_pack T_2_10_logic_cluster_lc_4 {o_rnd_i31}
+ble_pack T_2_14_logic_cluster_lc_6 {o_rnd_i9}
+ble_pack T_1_15_logic_cluster_lc_2 {IN_1__u_frlsfr4.i25_2_lut_4_lut}
+ble_pack T_1_16_logic_cluster_lc_6 {IN_0__u_frlsfr4.i205_4_lut}
+ble_pack T_2_12_logic_cluster_lc_4 {o_rnd_i23}
+ble_pack T_2_13_logic_cluster_lc_5 {o_rnd_i18}
+ble_pack T_2_16_logic_cluster_lc_2 {o_rnd_i5}
+ble_pack T_1_12_logic_cluster_lc_1 {IN_5__u_frlsfr4.i48_2_lut_4_lut}
+ble_pack T_1_13_logic_cluster_lc_5 {IN_3__u_frlsfr4.i44_3_lut_4_lut}
+ble_pack T_1_14_logic_cluster_lc_0 {IN_3__u_frlsfr4.i176_4_lut}
+ble_pack T_2_14_logic_cluster_lc_4 {o_rnd_i11}
+ble_pack T_1_10_logic_cluster_lc_2 {IN_7__u_frlsfr4.i54_2_lut_4_lut}
+ble_pack T_1_11_logic_cluster_lc_7 {IN_6__u_frlsfr4.i188_4_lut}
+ble_pack T_1_15_logic_cluster_lc_0 {IN_2__u_frlsfr4.i1_4_lut}
+ble_pack T_1_16_logic_cluster_lc_4 {IN_0__u_frlsfr4.i196_4_lut}
+ble_pack T_2_12_logic_cluster_lc_6 {o_rnd_i21}
+ble_pack T_1_13_logic_cluster_lc_7 {IN_3__u_frlsfr4.i241_4_lut}
+ble_pack T_1_14_logic_cluster_lc_2 {IN_3__u_frlsfr4.i32_2_lut_4_lut}
+ble_pack T_1_16_logic_cluster_lc_3 {IN_0__u_frlsfr4.i1_4_lut}
+ble_pack T_2_13_logic_cluster_lc_2 {IN_4__u_frlsfr4.i1_3_lut}
+ble_pack T_2_14_logic_cluster_lc_2 {o_rnd_i13}
+ble_pack T_2_16_logic_cluster_lc_5 {o_rnd_i2}
+ble_pack T_1_10_logic_cluster_lc_4 {IN_7__u_frlsfr4.i192_4_lut}
+ble_pack T_1_11_logic_cluster_lc_5 {IN_6__u_frlsfr4.i277_4_lut}
+ble_pack T_1_12_logic_cluster_lc_6 {IN_5__u_frlsfr4.i257_4_lut}
+ble_pack T_1_14_logic_cluster_lc_5 {IN_2__u_frlsfr4.i225_4_lut}
+ble_pack T_1_15_logic_cluster_lc_6 {IN_1__u_frlsfr4.i23_3_lut_4_lut}
+ble_pack T_1_13_logic_cluster_lc_1 {IN_4__u_frlsfr4.i253_4_lut}
+ble_pack T_1_16_logic_cluster_lc_1 {IN_0__u_frlsfr4.i200_4_lut}
+ble_pack T_2_12_logic_cluster_lc_1 {o_rnd_i26}
+ble_pack T_2_13_logic_cluster_lc_0 {IN_4__u_frlsfr4.i141_2_lut}
+ble_pack T_2_14_logic_cluster_lc_0 {o_rnd_i15}
+ble_pack T_2_16_logic_cluster_lc_7 {o_rnd_i0}
+ble_pack T_1_10_logic_cluster_lc_6 {IN_7__u_frlsfr4.i281_4_lut}
+ble_pack T_1_11_logic_cluster_lc_3 {IN_6__u_frlsfr4.i137_2_lut}
+ble_pack T_1_12_logic_cluster_lc_4 {IN_5__u_frlsfr4.i265_4_lut}
+ble_pack T_1_14_logic_cluster_lc_7 {IN_2__u_frlsfr4.i172_4_lut}
+ble_pack T_1_15_logic_cluster_lc_4 {IN_1__u_frlsfr4.i217_4_lut}
+ble_pack T_2_10_logic_cluster_lc_7 {o_rnd_i28}
+ble_pack T_1_13_logic_cluster_lc_3 {IN_4__u_frlsfr4.i180_4_lut}
+ble_pack T_2_12_logic_cluster_lc_3 {o_rnd_i24}
+ble_pack T_2_16_logic_cluster_lc_1 {o_rnd_i6}
+ble_pack T_1_12_logic_cluster_lc_2 {IN_5__u_frlsfr4.i36_2_lut_4_lut}
+ble_pack T_1_14_logic_cluster_lc_1 {IN_3__u_frlsfr4.i237_4_lut}
+ble_pack T_2_10_logic_cluster_lc_5 {o_rnd_i30}
+ble_pack T_2_14_logic_cluster_lc_7 {o_rnd_i8}
+ble_pack T_1_11_logic_cluster_lc_6 {IN_6__u_frlsfr4.i269_4_lut}
+ble_pack T_1_16_logic_cluster_lc_5 {IN_0__u_frlsfr4.i22_3_lut_4_lut}
+ble_pack T_2_13_logic_cluster_lc_4 {o_rnd_i19}
+ble_pack T_1_13_logic_cluster_lc_6 {IN_3__u_frlsfr4.i42_2_lut_4_lut}
+ble_pack T_2_16_logic_cluster_lc_4 {o_rnd_i3}
+ble_pack T_1_10_logic_cluster_lc_5 {IN_7__u_frlsfr4.i289_4_lut}
+ble_pack T_1_12_logic_cluster_lc_7 {IN_5__u_frlsfr4.i184_4_lut}
+ble_pack T_1_15_logic_cluster_lc_1 {IN_2__u_frlsfr4.i22_3_lut_4_lut}
+ble_pack T_2_12_logic_cluster_lc_7 {o_rnd_i20}
+ble_pack T_1_16_logic_cluster_lc_2 {IN_0__u_frlsfr4.i164_4_lut}
+ble_pack T_2_13_logic_cluster_lc_1 {IN_4__u_frlsfr4.i1_3_lut_adj_2}
+ble_pack T_2_14_logic_cluster_lc_3 {o_rnd_i12}
+ble_pack T_1_11_logic_cluster_lc_2 {IN_6__u_frlsfr4.i1_3_lut}
+
+###CLB List 12
+clb_pack T_1_11 {T_1_11_logic_cluster_lc_0,T_1_11_logic_cluster_lc_1,T_1_11_logic_cluster_lc_2,T_1_11_logic_cluster_lc_3,T_1_11_logic_cluster_lc_4,T_1_11_logic_cluster_lc_5,T_1_11_logic_cluster_lc_6,T_1_11_logic_cluster_lc_7}
+set_location T_1_11 1 11
+clb_pack T_1_15 {T_1_15_logic_cluster_lc_0,T_1_15_logic_cluster_lc_1,T_1_15_logic_cluster_lc_2,T_1_15_logic_cluster_lc_3,T_1_15_logic_cluster_lc_4,T_1_15_logic_cluster_lc_5,T_1_15_logic_cluster_lc_6,T_1_15_logic_cluster_lc_7}
+set_location T_1_15 1 15
+clb_pack T_2_13 {T_2_13_logic_cluster_lc_0,T_2_13_logic_cluster_lc_1,T_2_13_logic_cluster_lc_2,T_2_13_logic_cluster_lc_3,T_2_13_logic_cluster_lc_4,T_2_13_logic_cluster_lc_5,T_2_13_logic_cluster_lc_6,T_2_13_logic_cluster_lc_7}
+set_location T_2_13 2 13
+clb_pack T_1_10 {,,T_1_10_logic_cluster_lc_2,T_1_10_logic_cluster_lc_3,T_1_10_logic_cluster_lc_4,T_1_10_logic_cluster_lc_5,T_1_10_logic_cluster_lc_6,T_1_10_logic_cluster_lc_7}
+set_location T_1_10 1 10
+clb_pack T_1_12 {T_1_12_logic_cluster_lc_0,T_1_12_logic_cluster_lc_1,T_1_12_logic_cluster_lc_2,T_1_12_logic_cluster_lc_3,T_1_12_logic_cluster_lc_4,T_1_12_logic_cluster_lc_5,T_1_12_logic_cluster_lc_6,T_1_12_logic_cluster_lc_7}
+set_location T_1_12 1 12
+clb_pack T_1_14 {T_1_14_logic_cluster_lc_0,T_1_14_logic_cluster_lc_1,T_1_14_logic_cluster_lc_2,T_1_14_logic_cluster_lc_3,T_1_14_logic_cluster_lc_4,T_1_14_logic_cluster_lc_5,T_1_14_logic_cluster_lc_6,T_1_14_logic_cluster_lc_7}
+set_location T_1_14 1 14
+clb_pack T_1_16 {T_1_16_logic_cluster_lc_0,T_1_16_logic_cluster_lc_1,T_1_16_logic_cluster_lc_2,T_1_16_logic_cluster_lc_3,T_1_16_logic_cluster_lc_4,T_1_16_logic_cluster_lc_5,T_1_16_logic_cluster_lc_6,T_1_16_logic_cluster_lc_7}
+set_location T_1_16 1 16
+clb_pack T_2_10 {,,,,T_2_10_logic_cluster_lc_4,T_2_10_logic_cluster_lc_5,T_2_10_logic_cluster_lc_6,T_2_10_logic_cluster_lc_7}
+set_location T_2_10 2 10
+clb_pack T_2_12 {T_2_12_logic_cluster_lc_0,T_2_12_logic_cluster_lc_1,T_2_12_logic_cluster_lc_2,T_2_12_logic_cluster_lc_3,T_2_12_logic_cluster_lc_4,T_2_12_logic_cluster_lc_5,T_2_12_logic_cluster_lc_6,T_2_12_logic_cluster_lc_7}
+set_location T_2_12 2 12
+clb_pack T_2_14 {T_2_14_logic_cluster_lc_0,T_2_14_logic_cluster_lc_1,T_2_14_logic_cluster_lc_2,T_2_14_logic_cluster_lc_3,T_2_14_logic_cluster_lc_4,T_2_14_logic_cluster_lc_5,T_2_14_logic_cluster_lc_6,T_2_14_logic_cluster_lc_7}
+set_location T_2_14 2 14
+clb_pack T_2_16 {T_2_16_logic_cluster_lc_0,T_2_16_logic_cluster_lc_1,T_2_16_logic_cluster_lc_2,T_2_16_logic_cluster_lc_3,T_2_16_logic_cluster_lc_4,T_2_16_logic_cluster_lc_5,T_2_16_logic_cluster_lc_6,T_2_16_logic_cluster_lc_7}
+set_location T_2_16 2 16
+clb_pack T_1_13 {T_1_13_logic_cluster_lc_0,T_1_13_logic_cluster_lc_1,T_1_13_logic_cluster_lc_2,T_1_13_logic_cluster_lc_3,T_1_13_logic_cluster_lc_4,T_1_13_logic_cluster_lc_5,T_1_13_logic_cluster_lc_6,T_1_13_logic_cluster_lc_7}
+set_location T_1_13 1 13
+

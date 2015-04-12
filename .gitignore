@@ -95,3 +95,16 @@ projects/icestick/hardware/icecube2/trng_Implmnt/trng_XXXXXOLD.edf
 projects/icestick/hardware/icecube2/trng_Implmnt/sbt/Temp/sbt_temp.sdc
 projects/icestick/hardware/icecube2/trng_Implmnt/trng_XXXXXOLD.scf
 projects/icestick/hardware/icecube2/trng_lse.prj
+projects/icestick/application_notes_software/ftdi_d2xx/client.exe
+projects/icestick/application_notes_software/ftdi_d2xx/server.exe
+projects/icestick/application_notes_software/ftdi_d2xx/kidekin_trng_ftdi_d2xx.o
+projects/icestick/hardware/frlfsrentsrc_ip/frlfsrentsrc_ip/frlfsrentsrc_ip_Implmnt/frlfsrentsrc_ip.edf
+projects/icestick/hardware/frlfsrentsrc_ip/frlfsrentsrc_ip/frlfsrentsrc_ip_Implmnt/sbt/Log/iceCube0.log
+projects/icestick/hardware/frlfsrentsrc_ip/frlfsrentsrc_ip/frlfsrentsrc_ip_Implmnt/frlfsrentsrc_ip_lse.log
+projects/icestick/hardware/frlfsrentsrc_ip/frlfsrentsrc_ip/frlfsrentsrc_ip_Implmnt/frlfsrentsrc_ip.lsedata
+projects/icestick/hardware/frlfsrentsrc_ip/frlfsrentsrc_ip/frlfsrentsrc_ip_Implmnt/frlfsrentsrc_ip.scf
+projects/icestick/hardware/frlfsrentsrc_ip/frlfsrentsrc_ip/frlfsrentsrc_ip_Implmnt/sbt/Log/iceCube1.log
+projects/icestick/hardware/trng_bb/.vdbs/.dbStat.txt
+projects/icestick/hardware/trng_bb/.vdbs/dbStat.txt
+projects/icestick/hardware/frlfsrentsrc_ip/frlfsrentsrc_ip/.vdbs/dbStat.txt
+projects/icestick/hardware/icecube2/trng_Implmnt/sbt/Log/iceCube3.log

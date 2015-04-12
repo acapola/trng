@@ -56,12 +56,16 @@ module aes_serial_data_round (
     output reg o_valid
     );
 reg [127:0] state;
-reg [4:0] step;
-wire [4:0] next_step = step + 1'b1;
-localparam ADD_KEY = {5{1'b1}};
+reg [5:0] step;
+wire [5:0] next_step = step + 1'b1;
+localparam SHIFT_ROWS 		= 6'b010000;
+localparam MIXCOLUMNS_ENTRY = 6'b010001;
+localparam ADD_KEY = {6{1'b1}};
 wire [7:0] sbox_out;
 wire [127:0] shiftrows_out;
-wire [127:0] mixcolumns_out;
+//wire [127:0] mixcolumns_out;
+wire [7:0] mixcolumn_out;
+reg [23:0] mixcolumn_in_buf;
 reg sbox_in_valid;
 wire sbox_out_valid;
 always @(posedge i_clk, posedge i_reset) begin
@@ -71,6 +75,12 @@ always @(posedge i_clk, posedge i_reset) begin
     step <= ADD_KEY;
 	sbox_in_valid <= 1'b0;
   end else begin
+	if(step[1:0]==2'b01) begin //end of a column
+		mixcolumn_in_buf <= state[16+:24];
+	end else begin
+		mixcolumn_in_buf <= {state[0+:8],mixcolumn_in_buf[8+:16]};
+	end
+			
     case(step)
     ADD_KEY: begin
       if(i_valid) begin
@@ -87,38 +97,61 @@ always @(posedge i_clk, posedge i_reset) begin
 		sbox_in_valid <= 1'b0;
 	  end
     end
-    5'b10000: begin
-      if(i_shiftrows) begin
-        step <= ADD_KEY;
-        o_valid <= 1'b1;
-      end else begin
-        step <= next_step;
-      end
-      state <= shiftrows_out;
-	  sbox_in_valid <= 1'b0;
+    SHIFT_ROWS: begin
+		step <= next_step;
+		state <= {shiftrows_out[0+:8],shiftrows_out[8+:120]};//not exactly shiftrow state yet (we do that to minimize the number of muxes)
+		sbox_in_valid <= 1'b0;
     end
-    5'b10001: begin
-      step <= ADD_KEY;
-      o_valid <= 1'b1;
-      state <= mixcolumns_out;
-	  sbox_in_valid <= 1'b0;
-    end
-    default: begin//0 to 15 ->sbox
-		if(sbox_out_valid) begin
-			state <= {sbox_out,state[8+:120]};
+    MIXCOLUMNS_ENTRY: begin
+		if(i_shiftrows) begin
+			step <= ADD_KEY;
+			o_valid <= 1'b1;
+		end else begin
 			step <= next_step;
+		end
+		state <= {state[0+:8],state[8+:120]};//shiftrow state is at this point.
+		//mixcolumn_in_buf <= state[16+:24];//done in the mixcolumn_in_buf code before this big case switch.
+	end
+	default: begin//0 to 15 ->sbox, others->mixcolumns
+		if(step[5:4]==3'b000) begin
+			if(sbox_out_valid) begin
+				state <= {sbox_out,state[8+:120]};
+				step <= next_step;
+			end
+		end else begin
+			if(step==6'b100001) begin
+				step <= ADD_KEY;
+				o_valid <= 1'b1;
+			end else begin
+				step <= next_step;
+			end
+			state <= {mixcolumn_out,state[8+:120]};
 		end
     end  
     endcase
   end
 end
 aes_sbox_canright_l1 u_aes_sbox_canright_l1(.i_dat(state[0+:8]), .o_dat(sbox_out), .i_clk(i_clk), .i_valid(sbox_in_valid), .o_valid(sbox_out_valid), .i_decrypt(1'b0));
+//aes_sbox_ram_l1 u_aes_sbox_ram_l1(.i_dat(state[0+:8]), .o_dat(sbox_out), .i_clk(i_clk), .i_valid(sbox_in_valid), .o_valid(sbox_out_valid));
 aes_shift_rows_ref  u_aes_shift_rows       (.i_dat(state)      , .o_dat(shiftrows_out));
-aes_mix_columns_ref u_aes_mix_columns      (.i_dat(state)      , .o_dat(mixcolumns_out));
-
+//aes_mix_columns_ref u_aes_mix_columns      (.i_dat(state)      , .o_dat(mixcolumns_out));
+//assign mixcolumns_out = state;
+wire [31:0] mixcolumn_in = {mixcolumn_in_buf,state[0+:8]};
+aes_mix_column_quarter_ref u_aes_mix_column_quarter(.i_dat(mixcolumn_in), .o_dat(mixcolumn_out));
 always @* o_dat = state;
 endmodule
-
+module aes_sbox_ram_l1 (
+	input wire i_clk,
+	input wire i_valid,
+    input wire [7:0] i_dat,
+    output reg [7:0] o_dat,
+	output reg o_valid
+    );
+always @(i_clk) begin
+	o_dat <= i_dat;
+	o_valid <= i_valid;
+end
+endmodule
 
 module aespp (
   input wire i_reset,
@@ -132,6 +165,8 @@ module aespp (
   output reg o_valid
 );
 localparam USE_SERIAL_ROUND=1;
+reg [128-1:0] round_key;
+wire [128-1:0] aes_round_out;
 wire round_valid;
 reg [3:0] round;
 wire run = (i_valid | (round!=0)) & ~o_valid;
@@ -141,8 +176,6 @@ wire last_round = round==(9+USE_SERIAL_ROUND);
 wire final_add_key = (round >=(9+USE_SERIAL_ROUND)) & round_valid;
 reg [3:0] block;
 wire first_block = block==0;
-reg [128-1:0] round_key;
-wire [128-1:0] aes_round_out;
 wire [128-1:0] aes_state = first_round ?
                               first_block ? i_dat : i_dat^aes_round_out
                             : 
@@ -159,7 +192,12 @@ aes_serial_data_round u_aes_data_round(
       .o_dat(aes_round_out),
       .o_valid(round_valid)
 );
+/*always @(i_clk) begin
+	aes_round_out <= {aes_state[0+:8],aes_state[8+:120]};
+	round_valid <= valid ^ last_round ^ final_add_key;
+end*/
 always @* begin
+	//round_key=128'h00000000_00000000_00000000_00000000;
   case(round)
   4'h0: round_key=128'h00000000_00000000_00000000_00000000;
   4'h1: round_key=128'h62636363_62636363_62636363_62636363;

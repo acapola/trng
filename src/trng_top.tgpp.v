@@ -3,10 +3,10 @@
 ::tgpp::source async_trng_lib.tgpp.v
 ::tgpp::source sb_trng_lib.tgpp.v
 
-#set TRNG_IMPL lfsr_trng
+set TRNG_IMPL lfsr_trng
 #set TRNG_IMPL sb_trng
 #set TRNG_IMPL async_trng
-set TRNG_IMPL fake_trng
+#set TRNG_IMPL fake_trng
 
 set init_input 1
 #min is 1 (normal sampling)
@@ -130,7 +130,7 @@ if {$TRNG_TEST} {
 	}
 	set TRNG_APP 1
 	set TRNG_TEST 0		
-	set HAS_AESPP 0
+	set HAS_AESPP 1
 	set RESET_GUARD_CYCLES 128
 }
 if {$init_input} {
@@ -365,7 +365,7 @@ end
 
 
 wire [TRNG_NSRC*TRNG_SRC_WIDTH-1:0] trng_sampled;
-wire [TRNG_NSRC*TRNG_SRC_WIDTH-1:0] fake_trng_sampled;
+//wire [TRNG_NSRC*TRNG_SRC_WIDTH-1:0] fake_trng_sampled;
 /*reg [6:0] spy_a,spy_b,spy_c;
 always @(posedge i_clk) spy_a <= i_reset ? fake_trng_sampled[0*7+:7] : trng_sampled[0*7+:7];
 always @(posedge i_clk) spy_b <= i_reset ? fake_trng_sampled[1*7+:7] : trng_sampled[1*7+:7];
@@ -394,7 +394,7 @@ fake_trng #(.WIDTH(TRNG_OUT_WIDTH),.NSRC(TRNG_NSRC), .SRC_WIDTH(TRNG_SRC_WIDTH))
 	.o_valid(trng_valid),
 	.o_sampled(trng_sampled)
 );
-fake_trng #(.WIDTH(TRNG_OUT_WIDTH),.NSRC(TRNG_NSRC), .SRC_WIDTH(TRNG_SRC_WIDTH)) u_fake_trng (
+/*fake_trng #(.WIDTH(TRNG_OUT_WIDTH),.NSRC(TRNG_NSRC), .SRC_WIDTH(TRNG_SRC_WIDTH)) u_fake_trng (
 	.i_reset(1'b0),//we output o_sampled only during reset time...
 ``if {$init_input} {``	
 	.i_src_init_val(TRNG_SRC_INIT),//not used
@@ -404,7 +404,7 @@ fake_trng #(.WIDTH(TRNG_OUT_WIDTH),.NSRC(TRNG_NSRC), .SRC_WIDTH(TRNG_SRC_WIDTH))
 	.o_dat(),
 	.o_valid(),
 	.o_sampled(fake_trng_sampled)
-);
+);*/
 ``if {$HAS_AESPP} {``
 function [70:0] lfsr71Func;
     input [70:0] in;
@@ -487,7 +487,10 @@ if {$TRNG_RAW} {
 }
 
 #works up to RAW_WIDTH_BYTES=4
-set FIFO_DEPTH_WIDTH [expr (3+11)-($FIFO_IN_WIDTH_BYTES/2)]
+#set FIFO_DEPTH_WIDTH [expr (3+11)-($FIFO_IN_WIDTH_BYTES/2)]
+#for hx1k devices
+set FIFO_DEPTH_WIDTH [expr (3+10)-($FIFO_IN_WIDTH_BYTES/2)]
+
 ``
 localparam FIFO_IN_WIDTH_BYTES = `$FIFO_IN_WIDTH_BYTES`;
 localparam FIFO_DEPTH_WIDTH = `$FIFO_DEPTH_WIDTH`;

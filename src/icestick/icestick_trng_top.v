@@ -14,15 +14,16 @@ module icestick_trng_top(	//input wire RESET,
 	output wire [7:0] o_spy_c*/
     );
 /*	
+wire [4:0] led;
 LED_Rotation impl(
 	.clk(CLK), 
-	.LED1(o_led[0]),
-	.LED2(o_led[1]),
-	.LED3(o_led[2]),
-	.LED4(o_led[3]),
-	.LED5(o_led[4])
+	.LED1(led[0]),
+	.LED2(led[1]),
+	.LED3(led[2]),
+	.LED4(led[3]),
+	.LED5(led[4])
 	);
-
+always @* o_led = led;
 assign o_serial_data = 1'b1;
 */
 reg [31:0]  rst_count ;
@@ -104,7 +105,7 @@ module LED_Rotation(
 	assign LED2 = (dec_cntr == 1) ;
 	assign LED3 = (dec_cntr == 2) ;
 	assign LED4 = (dec_cntr == 3) ;
-	assign LED5 = 1'b1;
+	assign LED5 = div_cntr2[4];
 				
 endmodule
 `default_nettype wire

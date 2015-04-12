@@ -33,7 +33,7 @@ endmodule
 
 
 module lfsrentsrc #(
-	parameter RNG_WIDTH = 4,
+	parameter RNG_WIDTH = 32,
 	parameter RESET = 1
 	)(
 	input wire i_clk,

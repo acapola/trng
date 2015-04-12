@@ -30,6 +30,22 @@ always @* o_dat[15: 8]=s0^s1^xtime(s2)^xtime(s3)^s3;
 always @* o_dat[ 7: 0]=xtime(s0)^s0^s1^s2^xtime(s3);
 endmodule
 
+module aes_mix_column_quarter_ref(
+    input wire [31:0] i_dat,
+    output reg [7:0] o_dat
+    );
+    
+function [7:0] xtime;
+    input [7:0] b; xtime={b[6:0],1'b0}^(8'h1b&{8{b[7]}});
+endfunction
+
+wire [7:0] s0 = i_dat[24+:8];
+wire [7:0] s1 = i_dat[16+:8];
+wire [7:0] s2 = i_dat[ 8+:8];
+wire [7:0] s3 = i_dat[ 0+:8];
+always @* o_dat[ 7: 0]=xtime(s0)^s0^s1^s2^xtime(s3);
+endmodule
+
 module aes_inv_mix_columns_ref(
     input wire [127:0] i_dat,
     output wire [127:0] o_dat

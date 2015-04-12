@@ -4,7 +4,7 @@ Version=Lattice Semiconductor Corporation iCEcube - Release: 2014.12.27052 - Bui
 ProjectName=trng
 Vendor=SiliconBlue
 Synthesis=lse
-ProjectVFiles=../../../../src/trng_top.v=work,../../../../src/trng_com.v=work,../../../../src/ice40/trng_pll_96MHz.v=work,../../../../src/lfsrentsrc_rtl.v=work,../../../../src/aes_ref.v=work,../../../../src/aespp_rtl.v=work,../../../../src/icestick/icestick_trng_top.v=work
+ProjectVFiles=../../../../src/trng_top.v=work,../../../../src/trng_com.v=work,../../../../src/ice40/trng_pll_96MHz.v=work,../../../../src/aes_ref.v=work,../../../../src/aespp_rtl.v=work,../../../../src/icestick/icestick_trng_top.v=work,../../../../src/lfsrentsrc_bb.v=work
 ProjectCFiles=../contraints/timing100MHz_syn.sdc
 CurImplementation=trng_Implmnt
 Implementations=trng_Implmnt
@@ -61,13 +61,13 @@ DeviceFamily=iCE40
 Device=HX1K
 DevicePackage=TQ144
 DevicePower=
-NetlistFile=trng_Implmnt/trng.edf
+NetlistFile=
 AdditionalEDIFFile=
-IPEDIFFile=
+IPEDIFFile=../frlfsrentsrc_ip/frlfsrentsrc_ip/frlfsrentsrc_ip_Implmnt/sbt/IP/frlfsrentsrc32_ip.edf
 DesignLib=trng_Implmnt/sbt/netlist/oadb-icestick_trng_top
-DesignView=_rt
+DesignView=
 DesignCell=icestick_trng_top
-SynthesisSDCFile=trng_Implmnt/trng.scf
+SynthesisSDCFile=W:/trng/projects/icestick/hardware/trng_bb/trng_Implmnt/trng.scf
 UserPinConstraintFile=
 UserSDCFile=../contraints/timing100MHz.sdc
 PhysicalConstraintFile=../contraints/icestick_trng.pcf
