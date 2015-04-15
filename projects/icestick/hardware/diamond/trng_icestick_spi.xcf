@@ -18,7 +18,7 @@
 				<BScanVal>0</BScanVal>
 			</Bypass>
 			<File>W:/trng/projects/icestick/hardware/trng_bb/trng_Implmnt/sbt/outputs/bitmap/icestick_trng_top_bitmap.hex</File>
-			<FileTime>04/12/15 23:09:22</FileTime>
+			<FileTime>04/16/15 00:29:18</FileTime>
 			<Operation>SPI Flash Erase,Program,Verify</Operation>
 			<Option>
 				<SVFVendor>JTAG STANDARD</SVFVendor>
@@ -99,6 +99,6 @@
 	<CableOptions>
 		<CableName>USB2</CableName>
 		<PortAdd>FTUSB-0</PortAdd>
-		<USBID>Lattice FTUSB Interface Cable A Location 0000 Serial A</USBID>
+		<USBID>kidekin_trng A Location 0000 Serial A</USBID>
 	</CableOptions>
 </ispXCF>

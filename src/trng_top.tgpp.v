@@ -19,9 +19,11 @@ set RESET_GUARD_CYCLES 8
 
 set TRNG_CRC_SAMPLING 1
 
+set AESPP_LFSR_LOOP 0
+
 #select one test at most
 set TRNG_AUTOCO 0
-set TRNG_RAW 0
+set TRNG_RAW 1
 set TRNG_RESET_TEST 0
 
 #AUTOCO parameters
@@ -406,6 +408,7 @@ fake_trng #(.WIDTH(TRNG_OUT_WIDTH),.NSRC(TRNG_NSRC), .SRC_WIDTH(TRNG_SRC_WIDTH))
 	.o_sampled(fake_trng_sampled)
 );*/
 ``if {$HAS_AESPP} {``
+``if {$AESPP_LFSR_LOOP} {``
 function [70:0] lfsr71Func;
     input [70:0] in;
     integer i;
@@ -421,6 +424,7 @@ function [70:0] lfsr71Func;
         lfsr71Func = out;
     end
 endfunction
+``}``
 reg [127:0] ppin;
 reg [4:0] ppin_level;
 wire [127:0] ppout;
@@ -457,7 +461,11 @@ always @(posedge i_clk) begin
 		ppin_level <= 0;
 	end else begin
 		if(ppin_read) begin
+``if {$AESPP_LFSR_LOOP} {``
 			ppin <= {trng_valid ? trng_dat : 8'h00,{128-8-71{1'b0}},lfsr71Func(ppout_buf[8+:71])};
+``} else {``
+			ppin <= {trng_valid ? trng_dat : 8'h00,{128-8{1'b0}}};
+``}``
 			ppin_level <= 0;
 		end else if(trng_valid) begin
 			ppin <= {ppin[0+:TRNG_OUT_WIDTH] ^ trng_dat,ppin[TRNG_OUT_WIDTH+:128-TRNG_OUT_WIDTH]};
