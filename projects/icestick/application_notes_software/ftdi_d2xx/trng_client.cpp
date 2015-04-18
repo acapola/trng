@@ -1,15 +1,7 @@
-//
-// blocking_udp_echo_client.cpp
-// ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-// Copyright (c) 2003-2014 Christopher M. Kohlhoff (chris at kohlhoff dot com)
-//
-// Distributed under the Boost Software License, Version 1.0. (See accompanying
-// file LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-//
 
 #include <cstdlib>
 #include <cstring>
+#include <cstdio>
 #include <iostream>
 #include <boost/asio.hpp>
 #include <omp.h>
@@ -31,7 +23,7 @@ int main(int argc, char* argv[])
 	{
 		if (argc != 3)
 		{
-		  std::cerr << "Usage: blocking_udp_echo_client <host> <port>\n";
+		  std::cerr << "Usage: trng_client <host> <port>\n";
 		  return 1;
 		}
 
@@ -56,7 +48,7 @@ int main(int argc, char* argv[])
 			pFile = fopen(filename.str().c_str(), "wb");
 			
 			unsigned long long len=atoll(request)*1024*1024;
-			double mbits = len*8/(1024*1024);
+			double mbits = ((double)len)/(1024*1024/8);
 			request[0]=max_length & 0xFF;
 			request[1]=(max_length>>8) & 0xFF;
 			request[2]=(max_length>>16) & 0xFF;

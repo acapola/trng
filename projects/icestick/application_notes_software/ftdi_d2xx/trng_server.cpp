@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 	try{
 		if (argc != 2)
 		{
-		  cerr << "Usage: blocking_udp_echo_server <port>\n";
+		  cerr << "Usage: trng_server <port>\n";
 		  return 1;
 		}
 		unsigned int id = kidekin_trng_ftdi_find_next(0);

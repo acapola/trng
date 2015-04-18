@@ -78,12 +78,6 @@ bool kidekin_trng_ftdi_d2xx_open(unsigned int device_index){
 //return the number of bytes actually received, it should be equal to len, otherwise this indicates an error.
 //if it is less than len, subsequent calls are likely to fail.
 unsigned int kidekin_trng_ftdi_d2xx_read(uint8_t *rxBuffer, unsigned int len){
-	/*long unsigned int bytesReceived;
-	FT_STATUS ftStatus;
-	printf("hit key\n");getchar();
-	ftStatus = FT_Read(ftHandle,rxBuffer,len,&bytesReceived); 
-	if(ftStatus!=FT_OK) return -1;
-	return (unsigned int)bytesReceived;*/
 	if(readPos==-1) 
 		return -1;
 	unsigned int out=0;
