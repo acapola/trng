@@ -19,26 +19,18 @@ localparam TRNG_OUT_WIDTH = 8;
 reg trng_reset;
 wire com_ready;	
 wire trng_valid;
-wire trng_read = trng_valid;
+wire trng_read = com_ready & trng_valid;
 wire [7:0] trng_dat;
 wire com_new_frame;
 reg send;
 reg [7:0] to_send;
-wire [7:0] fifo_out;
-reg ram_valid;
-reg fifo_read_l1;
-wire fifo_read = com_ready & ram_valid & ~fifo_read_l1;//read only when we have filled the fifo and com do a read
 always @(posedge i_clk) begin
 	if(i_reset) begin
 		send <= 1'b0;
-		fifo_read_l1 <= 1'b0;
 	end else begin
-		if(fifo_read_l1) begin
-			fifo_read_l1 <= 1'b0;
+		if(com_ready & trng_valid) begin
 			send <= 1'b1;
-			to_send <= fifo_out;
-		end else if(fifo_read) begin
-			fifo_read_l1 <= 1'b1;
+			to_send <= trng_dat;
 		end else send <= 1'b0;
 	end
 end
@@ -61,23 +53,12 @@ end
 
 
 reg [15:0] reset_guard_cnt;
-wire reset_guard_time = 8 != reset_guard_cnt;
+wire reset_guard_time = 128 != reset_guard_cnt;
 
-reg [15:0] periodic_reset_cnt;
-wire fifo_emptied = (~ram_valid) & fifo_read_l1;//single cycle pulse
-wire periodic_reset = fifo_emptied & (periodic_reset_cnt==1);
-reg periodic_reset_l1;
-always @(posedge i_clk) periodic_reset_l1 <= periodic_reset;//register to have at least one full clock cycle to reset the trng
-always @(posedge i_clk) begin
-	if(i_reset | periodic_reset) periodic_reset_cnt <= {{15{1'b0}},1'b1};
-	else if(fifo_emptied) periodic_reset_cnt <= periodic_reset_cnt + 1'b1;	
-end
-reg fifo_write;
-always @(posedge i_clk) fifo_write <= ~ram_valid & ~reset_guard_time & ~periodic_reset;//fifo_write remains high for 1 cycle more than needed but fifo ignore it so no data is overwritten
-always @* trng_reset = i_reset | periodic_reset_l1;
+always @* trng_reset = i_reset;
 
 always @(posedge i_clk) begin
-	if(i_reset | periodic_reset) reset_guard_cnt <= {16{1'b0}};
+	if(i_reset ) reset_guard_cnt <= {16{1'b0}};
 	else if(reset_guard_time) reset_guard_cnt <= reset_guard_cnt + 1'b1;
 end
 
@@ -113,102 +94,8 @@ lfsr_trng trng (
 );*/
 
 
-localparam FIFO_IN_WIDTH_BYTES = 4;
-localparam FIFO_DEPTH_WIDTH = 11;
-//we store sampled data in ram until its full and then dump the full memory
-wire [31:0] byteAlignedSampledData = trng_sampled;
-wire [FIFO_IN_WIDTH_BYTES*8-1:0] fifo_in = byteAlignedSampledData[FIFO_IN_WIDTH_BYTES*8-1:0];
-wire fifo_empty,fifo_full;
-fifo #(
-	.DEPTH_WIDTH(FIFO_DEPTH_WIDTH)//8192 bytes FIFO
-	) u_fifo (
-	.i_reset(i_reset),
-	.i_clk(i_clk),
-	.i_write(fifo_write),
-	.i_read(fifo_read),
-	.i_dat(fifo_in),
-	.o_dat(fifo_out),
-	.o_almost_empty(fifo_empty),
-	.o_almost_full(fifo_full)
-	);
-always @(posedge i_clk) begin
-	if(i_reset) begin
-		ram_valid <= 1'b0;//0 when we fill the fifo, 1 when we empty it
-	end else begin
-		if(ram_valid) begin //we read the fifo, once per com byte
-			if(fifo_read) begin
-				ram_valid <= ~fifo_empty;
-			end
-		end else begin//we fill the fifo, once per clock
-			ram_valid <= fifo_full;
-		end
-	end
-end
 
 endmodule
-module fifo #(
-	parameter DEPTH_WIDTH = 10,
-	//fixed parameters
-	parameter OUT_WIDTH = 8,
-	parameter IN_WIDTH = 32
-	)(
-	input wire i_reset,
-	input wire i_clk,
-	input wire i_write,
-	input wire i_read,
-	input wire [IN_WIDTH-1:0] i_dat,
-	output reg [OUT_WIDTH-1:0] o_dat,
-	output reg o_almost_empty,//can read one more time
-	output reg o_empty,//cant read
-	output reg o_almost_full,//can write one more time
-	output reg o_full//can't write
-	);
-localparam DEPTH = 1 << DEPTH_WIDTH;
-//assume a RAM for implementation of storage => don't use shift reg structure, use addresses	
-reg [IN_WIDTH-1:0] storage[DEPTH-1:0];
-reg [DEPTH_WIDTH-1:0] write_addr;
-reg [DEPTH_WIDTH-1:0] read_addr;
-wire [DEPTH_WIDTH-1:0] next_write_addr = write_addr + 1'b1;
-wire [DEPTH_WIDTH-1:0] next_read_addr = read_addr + 1'b1;
-localparam OUT_PER_WORD = IN_WIDTH / OUT_WIDTH;
-reg [IN_WIDTH-1:0] out_buf;
-reg [OUT_PER_WORD-1:0] out_read_cnt;//way bigger than needed
-always @* o_dat = out_buf[0+:OUT_WIDTH];
-always @* o_almost_full = next_write_addr == read_addr;
-always @(posedge i_clk) begin
-	if(i_reset) begin
-		o_almost_empty <= 1'b0;
-		out_read_cnt <= OUT_PER_WORD-1;
-		o_full <= 1'b0;
-		o_empty <= 1'b1;
-		write_addr <= {DEPTH_WIDTH{1'b0}};
-		read_addr <= {DEPTH_WIDTH{1'b0}};
-	end else begin
-		if(i_write & ~o_full) begin
-			o_empty <= 1'b0;
-			o_almost_empty <= 1'b0;
-			o_full <= o_almost_full;
-			write_addr <= next_write_addr;
-			storage[write_addr] <= i_dat;
-		end else if(i_read & ~o_empty) begin //priority to write, allow to use single port RAMs
-			if(out_read_cnt==OUT_PER_WORD-1) begin
-				out_read_cnt <= 0;
-				o_almost_empty <= 1'b0;
-				o_empty <= o_almost_empty;
-				o_full <= 1'b0;
-				read_addr <= next_read_addr;
-				out_buf <= storage[read_addr];
-			end else begin
-				out_read_cnt <= out_read_cnt + 1'b1;
-				o_almost_empty <= (out_read_cnt == OUT_PER_WORD-2) & (next_read_addr == write_addr);
-				out_buf <= {{OUT_WIDTH{1'bx}},out_buf[OUT_WIDTH+:OUT_WIDTH*OUT_PER_WORD]};
-			end
-		end
-	end
-end
-endmodule
-
-
 
 module fake_trng #(
 	parameter WIDTH = 8,//max is 255
@@ -290,7 +177,7 @@ wire [CRC_STATE_WIDTH-1:0] crc_sampled = nextCRC8_D32(o_sampled,crc_input);
 always @(*) o_dat = crc_state;
 localparam SRC_WIDTH = 32;
 localparam SAMPLED_WIDTH = 32;
-localparam TARGET_CNT = 1 * WIDTH /8;
+localparam TARGET_CNT = 104 * WIDTH /8;
 lfsrentsrc #(.RNG_WIDTH(SRC_WIDTH)) u0_rnd_src (.i_reset(i_reset), .i_clk(i_clk), .i_en(1'b1), .o_rnd(o_sampled[0*SRC_WIDTH+:SRC_WIDTH]));
 localparam CNT_WIDTH = 4;
 reg [CNT_WIDTH-1:0] cnt;

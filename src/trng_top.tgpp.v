@@ -23,7 +23,7 @@ set AESPP_LFSR_LOOP 0
 
 #select one test at most
 set TRNG_AUTOCO 0
-set TRNG_RAW 1
+set TRNG_RAW 0
 set TRNG_RESET_TEST 0
 
 #AUTOCO parameters
@@ -132,8 +132,9 @@ if {$TRNG_TEST} {
 	}
 	set TRNG_APP 1
 	set TRNG_TEST 0		
-	set HAS_AESPP 1
+	set HAS_AESPP 0
 	set RESET_GUARD_CYCLES 128
+	set TRNG_OVERSAMPLING 104
 }
 if {$init_input} {
 	set len [llength $init_value]
