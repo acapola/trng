@@ -1,6 +1,12 @@
 #ifndef __KIDEKIN_TRNG_FTDI_D2XX_H__
 #define __KIDEKIN_TRNG_FTDI_D2XX_H__
 
+#include <cstdint>
+
+//default is to output some information message on stdout
+//if called with verbose_value=false, only fatal error message will be printed out.
+void kidekin_trng_set_verbose(bool verbose_value);
+
 //find the index of a kidekin_trng device 
 //call this with 0 to find the first device.
 unsigned int kidekin_trng_ftdi_find_next(unsigned int start_index);

@@ -1,4 +1,9 @@
-SUBSYSTEM=="tty", ATTRS{interface}=="kidekin_trng", ATTRS{bInterfaceNumber}=="00", NAME="kidekin_dont_use", MODE="0000", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_CANDIDATE}="0"
-#SUBSYSTEM=="tty", ATTRS{interface}=="kidekin_trng", ATTRS{bInterfaceNumber}=="01", NAME="kidekin_trng", MODE="0777", RUN+="/usr/bin/kidekin_trng_tty_setup_launcher.sh", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_CANDIDATE}="0"
-SUBSYSTEM=="tty", ATTRS{interface}=="kidekin_trng", ATTRS{bInterfaceNumber}=="01", SYMLINK+="kidekin_trng", , MODE="0777", RUN+="/usr/bin/kidekin_trng_tty_setup_launcher.sh", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_CANDIDATE}="0"
+#SYMLINK+= method works on more systems, if it does not on your system, please switch to the NAME= method.
 
+#disable the unused port.
+#SUBSYSTEM=="tty", ATTRS{interface}=="kidekin_trng", ATTRS{bInterfaceNumber}=="00", NAME="kidekin_dont_use", MODE="0000", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_CANDIDATE}="0"
+SUBSYSTEM=="tty", ATTRS{interface}=="kidekin_trng", ATTRS{bInterfaceNumber}=="00", SYMLINK+="kidekin_dont_use", MODE="0000", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_CANDIDATE}="0"
+
+#connect kidekin TRNG to /dev/random
+#SUBSYSTEM=="tty", ATTRS{interface}=="kidekin_trng", ATTRS{bInterfaceNumber}=="01", NAME="kidekin_trng", MODE="0777", RUN+="/usr/bin/kidekin_trng_tty_setup_launcher.sh", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_CANDIDATE}="0"
+SUBSYSTEM=="tty", ATTRS{interface}=="kidekin_trng", ATTRS{bInterfaceNumber}=="01", SYMLINK+="kidekin_trng", MODE="0777", RUN+="/usr/bin/kidekin_trng_tty_setup_launcher.sh", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_CANDIDATE}="0"
