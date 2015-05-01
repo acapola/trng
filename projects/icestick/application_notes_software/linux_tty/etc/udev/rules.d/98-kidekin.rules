@@ -5,5 +5,5 @@
 SUBSYSTEM=="tty", ATTRS{interface}=="kidekin_trng", ATTRS{bInterfaceNumber}=="00", SYMLINK+="kidekin_dont_use", MODE="0000", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_CANDIDATE}="0"
 
 #connect kidekin TRNG to /dev/random
-#SUBSYSTEM=="tty", ATTRS{interface}=="kidekin_trng", ATTRS{bInterfaceNumber}=="01", NAME="kidekin_trng", MODE="0777", RUN+="/usr/bin/kidekin_trng_tty_setup_launcher.sh", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_CANDIDATE}="0"
-SUBSYSTEM=="tty", ATTRS{interface}=="kidekin_trng", ATTRS{bInterfaceNumber}=="01", SYMLINK+="kidekin_trng", MODE="0777", RUN+="/usr/bin/kidekin_trng_tty_setup_launcher.sh", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_CANDIDATE}="0"
+#SUBSYSTEM=="tty", ATTRS{interface}=="kidekin_trng", ATTRS{bInterfaceNumber}=="01", NAME="kidekin_trng", MODE="0777", RUN+="/bin/stty raw -echo -ixoff -F /dev/%k speed 3000000", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_CANDIDATE}="0"
+SUBSYSTEM=="tty", ATTRS{interface}=="kidekin_trng", ATTRS{bInterfaceNumber}=="01", SYMLINK+="kidekin_trng", MODE="0777", RUN+="/bin/stty raw -echo -ixoff -F /dev/%k speed 3000000", ENV{ID_MM_DEVICE_IGNORE}="1", ENV{ID_MM_CANDIDATE}="0"
