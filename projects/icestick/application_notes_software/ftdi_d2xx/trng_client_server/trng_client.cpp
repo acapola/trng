@@ -57,6 +57,7 @@ int main(int argc, char* argv[])
 			// Starting the time measurement
 			double start = omp_get_wtime();
 			// Computations to be measured
+			unsigned int cnt=0;
 			while(len){
 				if(len<max_length){
 					request[0]=len & 0xFF;
@@ -70,8 +71,13 @@ int main(int argc, char* argv[])
 					boost::asio::buffer(reply, max_length), sender_endpoint);
 				fwrite(reply, 1, reply_length, pFile);
 				len-=reply_length;
+				cnt++;if(cnt%10==0){
+					printf(".");
+					std::cout.flush();
+				}
 			}
 			fclose(pFile);
+			printf("\n");
 			// Measuring the elapsed time
 			double end = omp_get_wtime();
 			// Time calculation (in seconds)	

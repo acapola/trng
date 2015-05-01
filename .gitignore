@@ -151,3 +151,4 @@ projects/icestick/hardware/trng_bb/xxx_lse_cp_file_list
 projects/icestick/hardware/trng_bb/xxx_lse_sign_file
 projects/icestick/branding/Thumbs.db
 projects/icestick/application_notes_software/ftdi_d2xx/trng_capture/build_dir*
+projects/icestick/application_notes_software/ftdi_d2xx/trng_client_server/build_dir*
