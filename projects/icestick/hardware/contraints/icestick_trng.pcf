@@ -15,11 +15,11 @@
 ###IOSet List 14
 set_io CLK 21
 
-set_io o_led[0] 99
-set_io o_led[1] 98
-set_io o_led[2] 97
-set_io o_led[3] 96
-set_io o_led[4] 95
+#set_io o_led[0] 99
+#set_io o_led[1] 98
+#set_io o_led[2] 97
+#set_io o_led[3] 96
+#set_io o_led[4] 95
 
 set_io i_serial_rts_n 7
 set_io o_serial_data 8

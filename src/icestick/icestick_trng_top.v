@@ -5,8 +5,8 @@ module icestick_trng_top(	//input wire RESET,
 	input wire CLK,
 	//input wire i_serial_data,
 	input wire i_serial_rts_n,
-	output wire o_serial_data,
-	output reg [4:0] o_led
+	output wire o_serial_data
+	//,output reg [4:0] o_led
 	//,output wire CLKOP
 	/*,
     output wire [7:0] o_spy_a,
@@ -44,10 +44,9 @@ trng_pll_96MHz ice_pll_inst(
 always @ (posedge CLK) begin
 	if (RESET) rst_count <= rst_count + 1'b1;
 end
-assign RESET = ~rst_count[27] ;
-always @* o_led[4] = RESET;	
-
+assign RESET = ~rst_count[8];//27 ->10s
 wire [3:0] dat_cnt;
+/*always @* o_led[4] = RESET;	
 	
 localparam SHIFT = 19;
 reg [SHIFT+16-1:0] cnt;
@@ -56,7 +55,7 @@ always @(posedge CLKOP) begin
 	else cnt <= cnt + 1'b1;
 	if(cnt[SHIFT+4]) o_led[3:0] <= dat_cnt;
 end 
-
+*/
 trng_top u_trng_top(
 	.i_reset(RESET),
 	.i_clk(CLKOP),
